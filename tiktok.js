@@ -1,7 +1,8 @@
+//Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
-ws.onopen = function (event) {
+ws.onOpen = function (event) {
     console.log("Working :)");
-    ws.send("Here's some text that the server is urgently awaiting!");
+    webSocket.send(json.stringify({cmdtype:"login"}));
 };
 
 setTimeout(function() {ws.send("Here's some text that the server is urgently awaiting!");}, 1000)
@@ -27,6 +28,40 @@ function sendText() {
     document.getElementById("text").value = "";
 }
 
+//Team
+//Recieve Team status from server
+var PlayerTeam
+
+var Team = document.getElementById("PlayerTeam");
+if(PlayerTeam == "X")
+{
+    Team.innerHTML = "You are: X";
+}
+else if(PlayerTeam == "O")
+{
+    Team.innerHTML = "You are: O";
+}
+else
+{
+    Team.innerHTML = "Oh god errors.";
+}
+
+//Turn management
+//Recieve turn status from server
+var IsTurn
+
+var Turn = document.getElementById("PlayerTurn");
+if (IsTurn == "Yours") {
+    Team.innerHTML = "It is your turn.";
+}
+else if (IsTurn == "Theirs") {
+    Team.innerHTML = "It is the enemy's turn.";
+}
+else {
+    Team.innerHTML = "Oh god errors.";
+}
+
+//Drawing
 var canvas = document.getElementById("TicTacToe");
 canvas.width = window.innerWidth*.30;
 canvas.height = window.innerHeight*.35;
@@ -44,26 +79,6 @@ var y = 10;
 var hy = 0;
 var T = 0;
 var L = 0;
-/*
-for(l=0; l < BoardNum; l++){
-for (i = 0; i < BoardNum; i++) {
-for (x = 0; x < LineMax2; x++) {
-
-    //vert line draw
-    ctx.moveTo(x * 23.3 + 23.3 + T * 40 * LineMax1, L * 40 * LineMax1 );
-    ctx.lineTo(x * 23.3 + 23.3 + T * 40 * LineMax1, 23.3 * LineMax1 + 23.3 + L * 40 * LineMax1);
-
-// horizontal line draw
-    ctx.moveTo(T * 40 * LineMax1, x * 23.3 + 23.3);
-    ctx.lineTo(23.3 * LineMax1 + 23.3 + T * 40 * LineMax1, x * 23.3 + 23.3);
-    ctx.stroke(); 
-}
-T++}
-
-T = 0;
-L++
-}
-*/
 function drawGrid(x, y, size) {
 
     for (var i = 0; i < 2; i++) {
@@ -80,42 +95,6 @@ function drawGrid(x, y, size) {
 }
 
 gridSeperation = 100;
-/*
-function projectTesseract(n, increment, gridSeperation, size) {
-    ctx.strokeStyle = "#"+toString(n)+toString(increment)+"0000";
-    console.log("#"+(n*5)+increment+"0000");
-    if (size == undefined) {
-        size = 25;
-    }
-
-    if (Math.floor(increment/2)-increment/2 == 0) {
-        for (var x = 0; x < (increment-2)*3+1; x++) {
-            y=0;
-            drawGrid(15+gridSeperation*x, 15+gridSeperation*y, size);
-        }
-    }
-
-    // if (Math.floor(increment/2)-increment/2 != 0) {
-    //     for (var y = 0; y < 3; y++) {
-    //         x=0;
-    //         drawGrid(15+gridSeperation*x, 15+gridSeperation*y, size);
-    //     }
-    // }
-
-    
-
-    x=0;
-    y=0;
-    
-    increment += 1;
-    
-    if (increment < n) {
-        projectTesseract(n, increment, gridSeperation*3, size*3);
-    }
-}
-
-projectTesseract(3, 0, 100, 25);
-*/
 ctx.strokeStyle = "#FF0000";
 for (var x = 0; x < 3; x++) {
     for (var y = 0; y < 3; y++) {
@@ -126,7 +105,9 @@ for (var x = 0; x < 3; x++) {
 ctx.strokeStyle = "#0000FF";
 drawGrid(x, y, gridSeperation, 50);
 
-/*ar MousePosX = 0;
+
+
+/*var MousePosX = 0;
 var MousePosY = 0;
 function GetMousePos(event) {
     if(!(event.clientX && event.clientY == "undefined"))
@@ -139,4 +120,4 @@ function GetMousePos(event) {
 
 document.addEventListener("click", GetMousePos);
 
-GetMousePos(); */
+GetMousePos();*/
