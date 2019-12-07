@@ -24,7 +24,7 @@ def createDimension(itNum=0):
             k = 0
             emptyState = not emptyState
             while k < width:
-                dimension[len(dimension)] = int(not emptyState)
+                dimension[len(dimension)] = {0:{0:int(not emptyState), 1:int(not emptyState), 2:int(not emptyState)}, 1:{0:int(not emptyState), 1:int(not emptyState), 2:int(not emptyState)}, 2:{0:int(not emptyState), 1:int(not emptyState), 2:int(not emptyState)}}
                 k += 1
             outerArray[len(outerArray)] = dimension
             i += 1
@@ -39,7 +39,7 @@ boardState = createDimension()
 print(boardState)
 
 def getCell(coords):
-    return boardState[coords[1]][coords[2]][coords[3]][coords[4]]
+    return boardState[coords[0]][coords[1]][coords[2]][coords[3]]
 
 def setCell(coords, val, i=0):
     #[0, 1, 1]
@@ -57,11 +57,17 @@ async def commandHandler(msg, websocket):
         print("Player is loging in.")
         await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X"}))
 
+    if msg["cmdtype"] == "setCell":
+        print(msg["coords"])
+        setCell(msg["coords"], msg["val"])
+
+    if (msg["cmdtype"] == "getCell"):
+        await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"])}))
+
 
 
 async def echo(websocket, path):
     async for message in websocket:
-        await websocket.send(message)
         print(message)
         await commandHandler(json.loads(message), websocket)
 
