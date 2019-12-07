@@ -1,3 +1,4 @@
+console.log("apple");
 var c = document.getElementById("TicTacToe");
 var ctx = c.getContext("2d");
 var drawx = 40;
