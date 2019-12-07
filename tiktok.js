@@ -1,11 +1,13 @@
-webSocket = new WebSocket("ws://127.0.0.1:8000");
-
-WebSocket.onopen = function (event) {
+ws = new WebSocket("ws://127.0.0.1:8000");
+ws.onOpen = function (event) {
     console.log("Working :)");
-    WebSocket.send("Here's some text that the server is urgently awaiting!");
+    webSocket.send("Here's some text that the server is urgently awaiting!");
 };
 
-WebSocket.onmessage = function (event) {
+setTimeout(function() {ws.send("Here's some text that the server is urgently awaiting!");}, 1000)
+
+
+ws.onmessage = function (event) {
     console.log(event.data);
 }
 
@@ -19,15 +21,15 @@ function sendText() {
     };
 
     // Send the msg object as a JSON-formatted string.
-    WebSocket.send(JSON.stringify(msg));
+    ws.send(JSON.stringify(msg));
 
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
 }
 
 var canvas = document.getElementById("TicTacToe");
-canvas.width = window.innerWidth*.95;
-canvas.height = window.innerHeight*.95;
+canvas.width = window.innerWidth*.30;
+canvas.height = window.innerHeight*.35;
 
 var ctx = canvas.getContext("2d");
 

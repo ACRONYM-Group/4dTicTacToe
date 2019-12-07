@@ -1,5 +1,7 @@
 import asyncio
 import websockets
+import ssl
+import pathlib
 
 numDimensions = 3
 width = 3
