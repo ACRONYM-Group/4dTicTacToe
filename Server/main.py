@@ -2,6 +2,7 @@ import asyncio
 import websockets
 import ssl
 import pathlib
+import json
 
 numDimensions = 3
 width = 3
@@ -49,12 +50,15 @@ def setCell(coords, val, i=0):
 
     exec(str(subArrayString) + " = val")
 
+def commandHandler(msg):
+    print(msg["cmdtype"])
+
 
 
 async def echo(websocket, path):
     async for message in websocket:
         await websocket.send(message)
-        print(message)
+        commandHandler(json.loads(message))
 
 
 asyncio.get_event_loop().run_until_complete(
