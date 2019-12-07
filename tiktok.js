@@ -1,7 +1,7 @@
-console.log("Working :)");
-webSocket = new WebSocket("wss://www.scienceandpizza.com:8000", "protocolOne");
+webSocket = new WebSocket("ws://127.0.0.1:8000");
 
 WebSocket.onopen = function (event) {
+    console.log("Working :)");
     WebSocket.send("Here's some text that the server is urgently awaiting!");
 };
 
@@ -124,3 +124,17 @@ for (var x = 0; x < 3; x++) {
 ctx.strokeStyle = "#0000FF";
 drawGrid(x, y, gridSeperation, 50);
 
+/*ar MousePosX = 0;
+var MousePosY = 0;
+function GetMousePos(event) {
+    if(!(event.clientX && event.clientY == "undefined"))
+    {
+        MousePosX = event.clientX;
+        MousePosY = event.clientY;
+        console.log("X: " + MousePosX);
+        console.log("Y: " + MousePosX);
+    }
+
+document.addEventListener("click", GetMousePos);
+
+GetMousePos(); */
