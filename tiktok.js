@@ -65,6 +65,7 @@ L++
 function drawGrid(x, y, size) {
 
     for (var i = 0; i < 2; i++) {
+        ctx.beginPath();
         ctx.moveTo(x+size*(i+1), y);
         ctx.lineTo(x+size*(i+1), y+size*3);
         ctx.stroke();
@@ -77,6 +78,7 @@ function drawGrid(x, y, size) {
 }
 
 gridSeperation = 100;
+/*
 function projectTesseract(n, increment, gridSeperation, size) {
     ctx.strokeStyle = "#"+toString(n)+toString(increment)+"0000";
     console.log("#"+(n*5)+increment+"0000");
@@ -85,7 +87,7 @@ function projectTesseract(n, increment, gridSeperation, size) {
     }
 
     if (Math.floor(increment/2)-increment/2 == 0) {
-        for (var x = 0; x < 3; x++) {
+        for (var x = 0; x < (increment-2)*3+1; x++) {
             y=0;
             drawGrid(15+gridSeperation*x, 15+gridSeperation*y, size);
         }
@@ -102,7 +104,6 @@ function projectTesseract(n, increment, gridSeperation, size) {
 
     x=0;
     y=0;
-    //drawGrid(x, y, gridSeperation, size*2);
     
     increment += 1;
     
@@ -111,11 +112,15 @@ function projectTesseract(n, increment, gridSeperation, size) {
     }
 }
 
-projectTesseract(3, 1, 100, 25);
-/*
+projectTesseract(3, 0, 100, 25);
+*/
+ctx.strokeStyle = "#FF0000";
 for (var x = 0; x < 3; x++) {
     for (var y = 0; y < 3; y++) {
         drawGrid(15+gridSeperation*x, 15+gridSeperation*y, 25);
     }
-}*/
+}
+
+ctx.strokeStyle = "#0000FF";
+drawGrid(x, y, gridSeperation, 50);
 
