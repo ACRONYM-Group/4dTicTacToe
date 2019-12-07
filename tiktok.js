@@ -1,6 +1,6 @@
 console.log("working :)");
 //Networking
-ws = new WebSocket("ws://127.0.0.1:8000");\
+ws = new WebSocket("ws://127.0.0.1:8000");
 
 ws.addEventListener('open', function (event) 
 {
