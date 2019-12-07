@@ -9,7 +9,6 @@ ws.onopen = function (event) {
     ws.send(JSON.stringify({cmdtype:"getCell", coords:[0, 1, 0, 0]}));
 };
 
-
 ws.onmessage = function (event) 
 {
     console.log(event.data);
@@ -83,10 +82,6 @@ var LineMax1 = 3;
 var LineMax2 = LineMax1;
 var BoardNum = 3;
 
-var y = 10;
-var hy = 0;
-var T = 0;
-var L = 0;
 function drawGrid(x, y, size) 
 {
 
@@ -114,7 +109,7 @@ for (var x = 0; x < 3; x++)
     }
 }
 
-ctx.strokeStyle = "#0000FF";
+ctx.strokeStyle = "#FFFFFF";
 drawGrid(x, y, gridSeperation, 50);
 
 
