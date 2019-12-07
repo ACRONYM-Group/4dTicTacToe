@@ -1,11 +1,13 @@
-console.log("Working :)");
-webSocket = new WebSocket("wss://www.scienceandpizza.com:8000", "protocolOne");
-
-WebSocket.onopen = function (event) {
-    WebSocket.send("Here's some text that the server is urgently awaiting!");
+webSocket = new WebSocket("ws://127.0.0.1:8000");
+ws.onOpen = function (event) {
+    console.log("Working :)");
+    webSocket.send("Here's some text that the server is urgently awaiting!");
 };
 
-WebSocket.onmessage = function (event) {
+setTimeout(function() {ws.send("Here's some text that the server is urgently awaiting!");}, 1000)
+
+
+ws.onmessage = function (event) {
     console.log(event.data);
 }
 
@@ -19,7 +21,7 @@ function sendText() {
     };
 
     // Send the msg object as a JSON-formatted string.
-    WebSocket.send(JSON.stringify(msg));
+    ws.send(JSON.stringify(msg));
 
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
