@@ -1,4 +1,30 @@
 console.log("Working :)");
+webSocket = new WebSocket("wss://www.scienceandpizza.com:8000", "protocolOne");
+
+exampleSocket.onopen = function (event) {
+    exampleSocket.send("Here's some text that the server is urgently awaiting!");
+};
+
+exampleSocket.onmessage = function (event) {
+    console.log(event.data);
+}
+
+function sendText() {
+    // Construct a msg object containing the data the server needs to process the message from the chat client.
+    var msg = {
+        type: "message",
+        text: document.getElementById("text").value,
+        id: clientID,
+        date: Date.now()
+    };
+
+    // Send the msg object as a JSON-formatted string.
+    exampleSocket.send(JSON.stringify(msg));
+
+    // Blank the text input element, ready to receive the next line of text from the user.
+    document.getElementById("text").value = "";
+}
+
 var c = document.getElementById("TicTacToe");
 c.width = window.innerWidth*.95;
 c.height = window.innerHeight*.95;
