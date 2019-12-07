@@ -1,9 +1,13 @@
 console.log("working :)");
 //Networking
-ws = new WebSocket("ws://127.0.0.1:8000");
+ws = new WebSocket("ws://127.0.0.1:8000");\
 
-ws.addEventListener('open', function (event) {
+ws.addEventListener('open', function (event) 
+{
     ws.send(JSON.stringify({ cmdtype: "login" }));
+    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [0, 0, 0, 0], val: "X" }));
+    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 0, 0, 0] }));
+    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 1, 0, 0] }));
 });
 
 ws.addEventListener('message', function (event) 
