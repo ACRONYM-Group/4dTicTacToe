@@ -1,37 +1,4 @@
 console.log("working :)");
-//Networking
-ws = new WebSocket("ws://127.0.0.1:8000");
-
-ws.addEventListener('open', function (event) 
-{
-    ws.send(JSON.stringify({ cmdtype: "login" }));
-    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [0, 0, 0, 0], val: "X" }));
-    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 0, 0, 0] }));
-    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 1, 0, 0] }));
-});
-
-ws.addEventListener('message', function (event) 
-{
-    console.log('Message from server ', event.data);
-});
-
-function sendText() 
-{
-    // Construct a msg object containing the data the server needs to process the message from the chat client.
-    var msg = {
-        type: "message",
-        text: document.getElementById("text").value,
-        id: clientID,
-        date: Date.now()
-    };
-
-    // Send the msg object as a JSON-formatted string.
-    ws.send(JSON.stringify(msg));
-
-    // Blank the text input element, ready to receive the next line of text from the user.
-    document.getElementById("text").value = "";
-}
-
 //Team
 //Recieve Team status from server
 var PlayerTeam = "X";
@@ -63,6 +30,14 @@ else if (IsTurn == "Theirs")
 {
     Turn.innerHTML = "It is the enemy's turn.";
 }
+else if (IsTurn == "You won")
+{
+    Turn.innerHTML = "Victory! You have won!";
+}
+else if (IsTurn == "They Won")
+{
+    Turn.innerHTML = "Defeat! You have lost!";
+}
 else 
 {
     Turn.innerHTML = "Oh god errors.";
@@ -76,6 +51,8 @@ canvas.height = 325;
 var ctx = canvas.getContext("2d");
 var cx = 0;
 var cy = 0;
+
+var size = 25
 
 var drawx = 40;
 var drawy = 40;
@@ -107,12 +84,12 @@ for (var x = 0; x < 3; x++)
 {
     for (var y = 0; y < 3; y++) 
     {
-        drawGrid(15+gridSeperation*x, 15+gridSeperation*y, 25);
+        drawGrid(15+gridSeperation*x, 15+gridSeperation*y, size);
     }
 }
 
 ctx.strokeStyle = "#FFFFFF";
-drawGrid(x, y, gridSeperation, 50);
+drawGrid(x, y, gridSeperation, size*2);
 var S2 = 100;
 var S1 = 25;
 
@@ -125,6 +102,7 @@ function getCursorPosition(canvas, event)
     cy = y;
 }
 
+//Figuring out where you clicked
 canvas.addEventListener('mousedown', function(e) 
 {
     getCursorPosition(canvas, e);
@@ -194,5 +172,43 @@ function trackclick()
         }
         sy++;
     }
+
     console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
+}
+
+function DrawCircle(BigX, BigY, SmallX, SmallY)
+{
+    ctx.beginPath();
+    ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
+    ctx.stroke();
+}
+
+//Networking
+ws = new WebSocket("ws://127.0.0.1:8000");
+
+ws.addEventListener('open', function (event) {
+    ws.send(JSON.stringify({ cmdtype: "login" }));
+    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [0, 0, 0, 0], val: "X" }));
+    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 0, 0, 0] }));
+    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 1, 0, 0] }));
+});
+
+ws.addEventListener('message', function (event) {
+    console.log('Message from server ', event.data);
+});
+
+function sendText() {
+    // Construct a msg object containing the data the server needs to process the message from the chat client.
+    var msg = {
+        type: "message",
+        text: document.getElementById("text").value,
+        id: clientID,
+        date: Date.now()
+    };
+
+    // Send the msg object as a JSON-formatted string.
+    ws.send(JSON.stringify(msg));
+
+    // Blank the text input element, ready to receive the next line of text from the user.
+    document.getElementById("text").value = "";
 }
