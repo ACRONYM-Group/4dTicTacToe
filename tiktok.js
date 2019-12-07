@@ -1,19 +1,4 @@
 console.log("working :)");
-//Networking
-ws = new WebSocket("ws://127.0.0.1:8000");
-
-ws.addEventListener('open', function (event) 
-{
-    ws.send(JSON.stringify({ cmdtype: "login" }));
-    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [0, 0, 0, 0], val: "X" }));
-    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 0, 0, 0] }));
-    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 1, 0, 0] }));
-});
-
-ws.addEventListener('message', function (event) 
-{
-    console.log('Message from server ', event.data);
-});
 var bx = 0;
 var by = 0;
 var sx = 0;
@@ -213,6 +198,12 @@ function trackclick()
     console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
 }
 
+function DrawCircle(BigX, BigY, SmallX, SmallY) {
+    ctx.beginPath();
+    ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
+    ctx.stroke();
+}
+
 function Fdrawx(){
     if(turn == true){
         console.log("heyo");
@@ -223,30 +214,10 @@ function Fdrawx(){
     }
 }
 
-var cbx =-1;
-var cby =-1;
-var csx =-1;
-var csy =-1;
-if(bx== 11){
-    cbx = 0
-}
-if(bx==21){cbx = 1}
-if (bx == 31){cbx = 2}
-if(by == 11){
-    cby = 0
-}
-if(by==21){cby = 1}
-if (by == 31){cby = 2}
-if(sx == 11){
-    csx = 0
-}
-if(sx==21){csx = 1}
-if (sx == 31){csx = 2}
-if(sy == 11){
-    csy = 0
-}
-if(sy==21){csy = 1}
-if (sy == 31){csy = 2}
+var cbx = (cby - 1) / 10 - 1;
+var cby = (cby - 1) / 10 - 1;
+var csx = (cby - 1) / 10 - 1;
+var csy = (cby - 1) / 10 - 1;
 
 canvas.addEventListener('mousedown', function(e) 
 {
@@ -254,6 +225,7 @@ canvas.addEventListener('mousedown', function(e)
     trackclick();
     Fdrawx();
 })
+
 /*var MousePosX = 0;
 var MousePosY = 0;
 function GetMousePos(event) {
@@ -263,8 +235,7 @@ function GetMousePos(event) {
         MousePosY = event.clientY;
         console.log("X: " + MousePosX);
         console.log("Y: " + MousePosX);
-    }
-
+    }*/
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
 
