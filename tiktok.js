@@ -114,13 +114,13 @@ for (var x = 0; x < 3; x++)
 ctx.strokeStyle = "#FFFFFF";
 drawGrid(x, y, gridSeperation, 50);
 var S2 = 100;
+var S1 = 25;
 
 function getCursorPosition(canvas, event) 
 {
     const rect = canvas.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
-    console.log("x: " + x + " y: " + y)
     cx = x;
     cy = y;
 }
@@ -133,57 +133,58 @@ canvas.addEventListener('mousedown', function(e)
 
 function trackclick()
 {
-for(bx=0; bx<3;)
-{
-
-    if(cx < S2*(bx+1)){
-        bx +=1;
-        bx *= 10;
-    }
-    bx++
-}
-for(by=0; by<3;)
-{
-    if(cy < S2*(by+1)){
-    by+=1;
-    by *= 10;
-    }
-    by++
-}
-if(bx==11)
-{
-
-}
-else if(bx==21)
-{
-cx -= 100;
-}
-else if(bx == 31)
-{
-cx -= 200;
-}
-
-if(by==11)
-{
-
-}
-else if(by==21)
-{
-    cy-=100;
-}
-else if(by==31)
-{
-    cy-=200;
-}
-    for(sx=0; sx<3;)
+    for(bx=0; bx<3;)
     {
-    if (cx < S1 * (sx+1) + 12)
-    {
-        sx+=1;
-        sx *= 10;
+        if(cx < S2*(bx+1))
+        {
+            bx +=1;
+            bx *= 10;
+        }
+        bx++;
     }
-    sx++;
-}
+
+    for(by=0; by<3;)
+    {
+        if(cy < S2*(by+1))
+        {
+            by+=1;
+            by *= 10;
+        }
+        by++;
+    }
+
+    if(bx==11)
+    {
+    }
+    else if(bx==21)
+    {
+    cx -= 100;
+    }
+    else if(bx == 31)
+    {
+    cx -= 200;
+    }
+
+    if(by==11)
+    {
+    }
+    else if(by==21)
+    {
+        cy-=100;
+    }
+    else if(by==31)
+    {
+        cy-=200;
+    }
+        for(sx=0; sx<3;)
+        {
+            if (cx < S1 * (sx+1) + 12)
+            {
+                sx+=1;
+                sx *= 10;
+            }
+            sx++;
+        }
     for(sy=0; sy<3; )
     {
         if(cy < S1*(sy+1)+12)
@@ -193,20 +194,5 @@ else if(by==31)
         }
         sy++;
     }
-   console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
+    console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
 }
-
-/*var MousePosX = 0;
-var MousePosY = 0;
-function GetMousePos(event) {
-    if(!(event.clientX && event.clientY == "undefined"))
-    {
-        MousePosX = event.clientX;
-        MousePosY = event.clientY;
-        console.log("X: " + MousePosX);
-        console.log("Y: " + MousePosX);
-    }
-
-document.addEventListener("click", GetMousePos);
-
-GetMousePos();*/
