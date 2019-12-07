@@ -1,4 +1,4 @@
-webSocket = new WebSocket("ws://127.0.0.1:8000");
+ws = new WebSocket("ws://127.0.0.1:8000");
 ws.onOpen = function (event) {
     console.log("Working :)");
     webSocket.send("Here's some text that the server is urgently awaiting!");
