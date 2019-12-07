@@ -28,8 +28,12 @@ function sendText() {
 var canvas = document.getElementById("TicTacToe");
 canvas.width = window.innerWidth*.95;
 canvas.height = window.innerHeight*.95;
-
+var sqr1 = false;
+var sqr2 = false; 
+var sqr3 = false;
 var ctx = canvas.getContext("2d");
+var cx = 0;
+var cy = 0;
 
 var drawx = 40;
 var drawy = 40;
@@ -114,13 +118,66 @@ function projectTesseract(n, increment, gridSeperation, size) {
 
 projectTesseract(3, 0, 100, 25);
 */
+
+
 ctx.strokeStyle = "#FF0000";
 for (var x = 0; x < 3; x++) {
     for (var y = 0; y < 3; y++) {
-        drawGrid(15+gridSeperation*x, 15+gridSeperation*y, 25);
+        drawGrid(15+gridSeperation*x, 15+gridSeperation*y, 27);
     }
 }
-
+var S1 = 25;
 ctx.strokeStyle = "#0000FF";
 drawGrid(x, y, gridSeperation, 50);
+var S2 = 100;
+
+function getCursorPosition(canvas, event) {
+    const rect = canvas.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+    console.log("x: " + x + " y: " + y)
+    cx = x;
+    cy = y;
+}
+
+canvas.addEventListener('mousedown', function(e) {
+    getCursorPosition(canvas, e);
+    trackclick();
+})
+
+function trackclick(){
+for(bx=0; bx<3;){
+
+    if(cx < S2*(bx+1)){
+        bx +=1;
+        bx *= 10;
+    }
+    bx++
+}
+for(by=0; by<3;){
+    if(cy < S2*(by+1)){
+    by+=1;
+    by *= 10;
+    }
+    by++
+}
+if(bx==11){}
+else if(bx==21){cx -= 100}
+else if(bx == 31){cx -= 200}
+if(by==11){}
+else if(by==21){cy-=100}
+else if(by==31){cy-=200}
+    for(sx=0; sx<3;){
+    if (cx < S1*(sx+1)+12){
+        sx+=1;
+        sx *= 10;
+    }sx++}
+    for(sy=0; sy<3; ){
+        if(cy < S1*(sy+1)+12){
+            sy +=1;
+            sy *= 10;
+        }
+        sy++
+    }
+   console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)}
 
