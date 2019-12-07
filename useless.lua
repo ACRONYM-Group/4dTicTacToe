@@ -1,1 +1,1 @@
-print('why are you running lua?')
+--Why do you exist?
