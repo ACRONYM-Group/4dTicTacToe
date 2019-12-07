@@ -1,11 +1,9 @@
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
-ws.onOpen = function (event) {
+ws.onopen = function (event) {
     console.log("Working :)");
-    webSocket.send(json.stringify({cmdtype:"login"}));
+    ws.send(JSON.stringify({cmdtype:"login"}));
 };
-
-setTimeout(function() {ws.send("Here's some text that the server is urgently awaiting!");}, 1000)
 
 
 ws.onmessage = function (event) {
