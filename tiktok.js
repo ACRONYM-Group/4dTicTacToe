@@ -14,7 +14,10 @@ ws.addEventListener('message', function (event)
 {
     console.log('Message from server ', event.data);
 });
-
+var bx = 0;
+var by = 0;
+var sx = 0;
+var sy = 0;
 function sendText() 
 {
     // Construct a msg object containing the data the server needs to process the message from the chat client.
@@ -35,6 +38,7 @@ function sendText()
 //Team
 //Recieve Team status from server
 var PlayerTeam = "X";
+var turn = true;
 
 var Team = document.getElementById("PlayerTeam");
 if(PlayerTeam == "X")
@@ -113,6 +117,7 @@ for (var x = 0; x < 3; x++)
 
 ctx.strokeStyle = "#FFFFFF";
 drawGrid(x, y, gridSeperation, 50);
+var S1 = 25;
 var S2 = 100;
 
 function getCursorPosition(canvas, event) 
@@ -125,11 +130,7 @@ function getCursorPosition(canvas, event)
     cy = y;
 }
 
-canvas.addEventListener('mousedown', function(e) 
-{
-    getCursorPosition(canvas, e);
-    trackclick();
-})
+
 
 function trackclick()
 {
@@ -196,6 +197,47 @@ else if(by==31)
    console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
 }
 
+function Fdrawx(){
+    if(turn == true){
+        console.log("heyo");
+        ctx.moveTo(cbx*S2+csx*S1, cby*S2+csy*S1);
+        ctx.lineTo(cbx*S2+(csx+1)*S1, cby*S2+(csy+1)*S1);
+        ctx.stroke();
+        console.log(cbx*S2+csx*S1, cby*S2+csy*S1, cbx*S2+(csx+1)*S1, cby*S2+(csy+1)*S1 )
+    }
+}
+
+var cbx =-1;
+var cby =-1;
+var csx =-1;
+var csy =-1;
+if(bx== 11){
+    cbx = 0
+}
+if(bx==21){cbx = 1}
+if (bx == 31){cbx = 2}
+if(by == 11){
+    cby = 0
+}
+if(by==21){cby = 1}
+if (by == 31){cby = 2}
+if(sx == 11){
+    csx = 0
+}
+if(sx==21){csx = 1}
+if (sx == 31){csx = 2}
+if(sy == 11){
+    csy = 0
+}
+if(sy==21){csy = 1}
+if (sy == 31){csy = 2}
+
+canvas.addEventListener('mousedown', function(e) 
+{
+    getCursorPosition(canvas, e);
+    trackclick();
+    Fdrawx();
+})
 /*var MousePosX = 0;
 var MousePosY = 0;
 function GetMousePos(event) {
