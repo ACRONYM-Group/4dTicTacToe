@@ -1,3 +1,4 @@
+console.log("working :)");
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
 ws.onopen = function (event) {
@@ -6,11 +7,13 @@ ws.onopen = function (event) {
 };
 
 
-ws.onmessage = function (event) {
+ws.onmessage = function (event) 
+{
     console.log(event.data);
 }
 
-function sendText() {
+function sendText() 
+{
     // Construct a msg object containing the data the server needs to process the message from the chat client.
     var msg = {
         type: "message",
@@ -28,7 +31,8 @@ function sendText() {
 
 //Team
 //Recieve Team status from server
-var PlayerTeam
+var PlayerTeam = "X";
+
 
 var Team = document.getElementById("PlayerTeam");
 if(PlayerTeam == "X")
@@ -46,23 +50,26 @@ else
 
 //Turn management
 //Recieve turn status from server
-var IsTurn
+var IsTurn = "Yours";
 
 var Turn = document.getElementById("PlayerTurn");
-if (IsTurn == "Yours") {
-    Team.innerHTML = "It is your turn.";
+if (IsTurn == "Yours") 
+{
+    Turn.innerHTML = "It is your turn.";
 }
-else if (IsTurn == "Theirs") {
-    Team.innerHTML = "It is the enemy's turn.";
+else if (IsTurn == "Theirs") 
+{
+    Turn.innerHTML = "It is the enemy's turn.";
 }
-else {
-    Team.innerHTML = "Oh god errors.";
+else 
+{
+    Turn.innerHTML = "Oh god errors.";
 }
 
 //Drawing
 var canvas = document.getElementById("TicTacToe");
-canvas.width = window.innerWidth*.30;
-canvas.height = window.innerHeight*.35;
+canvas.width = 325;
+canvas.height = 325;
 
 var ctx = canvas.getContext("2d");
 
@@ -77,9 +84,11 @@ var y = 10;
 var hy = 0;
 var T = 0;
 var L = 0;
-function drawGrid(x, y, size) {
+function drawGrid(x, y, size) 
+{
 
-    for (var i = 0; i < 2; i++) {
+    for (var i = 0; i < 2; i++) 
+    {
         ctx.beginPath();
         ctx.moveTo(x+size*(i+1), y);
         ctx.lineTo(x+size*(i+1), y+size*3);
@@ -94,8 +103,10 @@ function drawGrid(x, y, size) {
 
 gridSeperation = 100;
 ctx.strokeStyle = "#FF0000";
-for (var x = 0; x < 3; x++) {
-    for (var y = 0; y < 3; y++) {
+for (var x = 0; x < 3; x++) 
+{
+    for (var y = 0; y < 3; y++) 
+    {
         drawGrid(15+gridSeperation*x, 15+gridSeperation*y, 25);
     }
 }
