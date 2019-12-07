@@ -1,20 +1,57 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>
-        3D Tic Tac Toe
-    </title>
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico">
-
+    <title>4D Tic Tac Toe</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <canvas id="TicTacToe" style="padding:0px;">
+    <header class="navbar">
+        <div class="flexbox">
+            <div class="logoDiv" style="position: relative;">
+                <a href="index.dpy" style="display:flex; padding:0; margin-left:10px;">
+                    <img src="ACRONYM.png" style="width: 40px; height:40px;">
+                    <h3 class="logo">ACRONYM</h3>
+                </a>
+            </div>
+            <div class="dropdownBar"></div>
+            <div class="dropdown">
+                <button class="dropbtn">ACRONYMIC</button>
+                <div class="dropdown-content">
+                    <a href="signup.dpy">Sign Up</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">About Us</button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Projects</button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                    <a href="#">Link 4</a>
+                    <a href="#">Link 5</a>
+                </div>
+            </div>
+            <a href="login.dpy" class="loginButton">Log In</a>
+        </div>
 
-    </canvas>
-    <script src="tiktok.js">
-    </script>
+    </header>
+    <div id="main">
+        <div align="center">
+            <h1>4D Tic Tac Toe</h1>
+            <canvas id="TicTacToe" style="padding:0px"></canvas>
+            <p id="PlayerTeam"> </p>
+            <p id="PlayerTurn"> </p>
+        </div>
+
+    </div>
+    <script src="tiktok.js"></script>
 </body>
 
 </html>

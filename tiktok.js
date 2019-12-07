@@ -1,15 +1,22 @@
-console.log("Working :)");
-webSocket = new WebSocket("wss://www.scienceandpizza.com:8000", "protocolOne");
+console.log("working :)");
+//Networking
+ws = new WebSocket("ws://127.0.0.1:8000");
 
-WebSocket.onopen = function (event) {
-    WebSocket.send("Here's some text that the server is urgently awaiting!");
-};
+ws.addEventListener('open', function (event) 
+{
+    ws.send(JSON.stringify({ cmdtype: "login" }));
+    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [0, 0, 0, 0], val: "X" }));
+    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 0, 0, 0] }));
+    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 1, 0, 0] }));
+});
 
-WebSocket.onmessage = function (event) {
-    console.log(event.data);
-}
+ws.addEventListener('message', function (event) 
+{
+    console.log('Message from server ', event.data);
+});
 
-function sendText() {
+function sendText() 
+{
     // Construct a msg object containing the data the server needs to process the message from the chat client.
     var msg = {
         type: "message",
@@ -19,18 +26,53 @@ function sendText() {
     };
 
     // Send the msg object as a JSON-formatted string.
-    WebSocket.send(JSON.stringify(msg));
+    ws.send(JSON.stringify(msg));
 
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
 }
 
+//Team
+//Recieve Team status from server
+var PlayerTeam = "X";
+
+var Team = document.getElementById("PlayerTeam");
+if(PlayerTeam == "X")
+{
+    Team.innerHTML = "You are: X";
+}
+else if(PlayerTeam == "O")
+{
+    Team.innerHTML = "You are: O";
+}
+else
+{
+    Team.innerHTML = "Oh god errors.";
+}
+
+//Turn management
+//Recieve turn status from server
+var IsTurn = "Yours";
+
+var Turn = document.getElementById("PlayerTurn");
+if (IsTurn == "Yours") 
+{
+    Turn.innerHTML = "It is your turn.";
+}
+else if (IsTurn == "Theirs") 
+{
+    Turn.innerHTML = "It is the enemy's turn.";
+}
+else 
+{
+    Turn.innerHTML = "Oh god errors.";
+}
+
+//Drawing
 var canvas = document.getElementById("TicTacToe");
-canvas.width = window.innerWidth*.95;
-canvas.height = window.innerHeight*.95;
-var sqr1 = false;
-var sqr2 = false; 
-var sqr3 = false;
+canvas.width = 325;
+canvas.height = 325;
+
 var ctx = canvas.getContext("2d");
 var cx = 0;
 var cy = 0;
@@ -42,33 +84,11 @@ var LineMax1 = 3;
 var LineMax2 = LineMax1;
 var BoardNum = 3;
 
-var y = 10;
-var hy = 0;
-var T = 0;
-var L = 0;
-/*
-for(l=0; l < BoardNum; l++){
-for (i = 0; i < BoardNum; i++) {
-for (x = 0; x < LineMax2; x++) {
+function drawGrid(x, y, size) 
+{
 
-    //vert line draw
-    ctx.moveTo(x * 23.3 + 23.3 + T * 40 * LineMax1, L * 40 * LineMax1 );
-    ctx.lineTo(x * 23.3 + 23.3 + T * 40 * LineMax1, 23.3 * LineMax1 + 23.3 + L * 40 * LineMax1);
-
-// horizontal line draw
-    ctx.moveTo(T * 40 * LineMax1, x * 23.3 + 23.3);
-    ctx.lineTo(23.3 * LineMax1 + 23.3 + T * 40 * LineMax1, x * 23.3 + 23.3);
-    ctx.stroke(); 
-}
-T++}
-
-T = 0;
-L++
-}
-*/
-function drawGrid(x, y, size) {
-
-    for (var i = 0; i < 2; i++) {
+    for (var i = 0; i < 2; i++) 
+    {
         ctx.beginPath();
         ctx.moveTo(x+size*(i+1), y);
         ctx.lineTo(x+size*(i+1), y+size*3);
@@ -82,52 +102,16 @@ function drawGrid(x, y, size) {
 }
 
 gridSeperation = 100;
-/*
-function projectTesseract(n, increment, gridSeperation, size) {
-    ctx.strokeStyle = "#"+toString(n)+toString(increment)+"0000";
-    console.log("#"+(n*5)+increment+"0000");
-    if (size == undefined) {
-        size = 25;
-    }
-
-    if (Math.floor(increment/2)-increment/2 == 0) {
-        for (var x = 0; x < (increment-2)*3+1; x++) {
-            y=0;
-            drawGrid(15+gridSeperation*x, 15+gridSeperation*y, size);
-        }
-    }
-
-    // if (Math.floor(increment/2)-increment/2 != 0) {
-    //     for (var y = 0; y < 3; y++) {
-    //         x=0;
-    //         drawGrid(15+gridSeperation*x, 15+gridSeperation*y, size);
-    //     }
-    // }
-
-    
-
-    x=0;
-    y=0;
-    
-    increment += 1;
-    
-    if (increment < n) {
-        projectTesseract(n, increment, gridSeperation*3, size*3);
+ctx.strokeStyle = "#FF0088";
+for (var x = 0; x < 3; x++) 
+{
+    for (var y = 0; y < 3; y++) 
+    {
+        drawGrid(15+gridSeperation*x, 15+gridSeperation*y, 25);
     }
 }
 
-projectTesseract(3, 0, 100, 25);
-*/
-
-
-ctx.strokeStyle = "#FF0000";
-for (var x = 0; x < 3; x++) {
-    for (var y = 0; y < 3; y++) {
-        drawGrid(15+gridSeperation*x, 15+gridSeperation*y, 27);
-    }
-}
-var S1 = 25;
-ctx.strokeStyle = "#0000FF";
+ctx.strokeStyle = "#FFFFFF";
 drawGrid(x, y, gridSeperation, 50);
 var S2 = 100;
 
@@ -181,3 +165,17 @@ else if(by==31){cy-=200}
     }
    console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)}
 
+/*var MousePosX = 0;
+var MousePosY = 0;
+function GetMousePos(event) {
+    if(!(event.clientX && event.clientY == "undefined"))
+    {
+        MousePosX = event.clientX;
+        MousePosY = event.clientY;
+        console.log("X: " + MousePosX);
+        console.log("Y: " + MousePosX);
+    }
+
+document.addEventListener("click", GetMousePos);
+
+GetMousePos();*/
