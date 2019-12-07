@@ -115,7 +115,8 @@ ctx.strokeStyle = "#FFFFFF";
 drawGrid(x, y, gridSeperation, 50);
 var S2 = 100;
 
-function getCursorPosition(canvas, event) {
+function getCursorPosition(canvas, event) 
+{
     const rect = canvas.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
@@ -124,13 +125,16 @@ function getCursorPosition(canvas, event) {
     cy = y;
 }
 
-canvas.addEventListener('mousedown', function(e) {
+canvas.addEventListener('mousedown', function(e) 
+{
     getCursorPosition(canvas, e);
     trackclick();
 })
 
-function trackclick(){
-for(bx=0; bx<3;){
+function trackclick()
+{
+for(bx=0; bx<3;)
+{
 
     if(cx < S2*(bx+1)){
         bx +=1;
@@ -138,32 +142,59 @@ for(bx=0; bx<3;){
     }
     bx++
 }
-for(by=0; by<3;){
+for(by=0; by<3;)
+{
     if(cy < S2*(by+1)){
     by+=1;
     by *= 10;
     }
     by++
 }
-if(bx==11){}
-else if(bx==21){cx -= 100}
-else if(bx == 31){cx -= 200}
-if(by==11){}
-else if(by==21){cy-=100}
-else if(by==31){cy-=200}
-    for(sx=0; sx<3;){
-    if (cx < S1*(sx+1)+12){
+if(bx==11)
+{
+
+}
+else if(bx==21)
+{
+cx -= 100;
+}
+else if(bx == 31)
+{
+cx -= 200;
+}
+
+if(by==11)
+{
+
+}
+else if(by==21)
+{
+    cy-=100;
+}
+else if(by==31)
+{
+    cy-=200;
+}
+    for(sx=0; sx<3;)
+    {
+    if (cx < S1 * (sx+1) + 12)
+    {
         sx+=1;
         sx *= 10;
-    }sx++}
-    for(sy=0; sy<3; ){
-        if(cy < S1*(sy+1)+12){
+    }
+    sx++;
+}
+    for(sy=0; sy<3; )
+    {
+        if(cy < S1*(sy+1)+12)
+        {
             sy +=1;
             sy *= 10;
         }
-        sy++
+        sy++;
     }
-   console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)}
+   console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
+}
 
 /*var MousePosX = 0;
 var MousePosY = 0;
