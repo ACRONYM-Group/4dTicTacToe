@@ -79,6 +79,20 @@ var BoardNum = 3;
 var y = 10;
 var hy = 0;
 var T = 0;
+<<<<<<< HEAD
+for(i=0; i<3; i++){
+for (x=0; x<2; x++) {
+    ctx.moveTo(x*23.3+23.3+T*80, y);
+    ctx.lineTo(x*23.3+23.3+T*80, y+70);
+//jordan is a normal sized bitch
+//does ian even do anything?
+    ctx.moveTo(hy+T*80, x*23.3+33.3);
+    ctx.lineTo(hy+70+T*80, x*23.3+33.3);
+    ctx.stroke(); 
+}
+T++
+}
+=======
 var L = 0;
 function drawGrid(x, y, size) {
 
@@ -122,3 +136,4 @@ function GetMousePos(event) {
 document.addEventListener("click", GetMousePos);
 
 GetMousePos();*/
+>>>>>>> dddf3c1ae8159e0b5e69d227c0c6e38bfef072c4
