@@ -1,15 +1,15 @@
 console.log("working :)");
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
-ws.onopen = function (event) {
-    console.log("Working :)");
-    ws.send(JSON.stringify({cmdtype:"login"}));
-};
 
-ws.onmessage = function (event) 
+ws.addEventListener('open', function (event) {
+    ws.send(JSON.stringify({ cmdtype: "login" }));
+});
+
+ws.addEventListener('message', function (event) 
 {
-    console.log(event.data);
-}
+    console.log('Message from server ', event.data);
+});
 
 function sendText() 
 {
@@ -31,7 +31,6 @@ function sendText()
 //Team
 //Recieve Team status from server
 var PlayerTeam = "X";
-
 
 var Team = document.getElementById("PlayerTeam");
 if(PlayerTeam == "X")
@@ -97,7 +96,7 @@ function drawGrid(x, y, size)
 }
 
 gridSeperation = 100;
-ctx.strokeStyle = "#FF0000";
+ctx.strokeStyle = "#FF0088";
 for (var x = 0; x < 3; x++) 
 {
     for (var y = 0; y < 3; y++) 
@@ -108,8 +107,6 @@ for (var x = 0; x < 3; x++)
 
 ctx.strokeStyle = "#FFFFFF";
 drawGrid(x, y, gridSeperation, 50);
-
-
 
 /*var MousePosX = 0;
 var MousePosY = 0;
