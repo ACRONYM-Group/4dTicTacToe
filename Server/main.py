@@ -50,15 +50,20 @@ def setCell(coords, val, i=0):
 
     exec(str(subArrayString) + " = val")
 
-def commandHandler(msg):
+async def commandHandler(msg, websocket):
     print(msg["cmdtype"])
+
+    if msg["cmdtype"] == "login":
+        print("Player is loging in.")
+        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X"}))
 
 
 
 async def echo(websocket, path):
     async for message in websocket:
         await websocket.send(message)
-        commandHandler(json.loads(message))
+        print(message)
+        await commandHandler(json.loads(message), websocket)
 
 
 asyncio.get_event_loop().run_until_complete(
