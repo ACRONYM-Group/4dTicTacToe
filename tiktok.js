@@ -1,6 +1,7 @@
 console.log("working :)");
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
+
 ws.onOpen = function (event) 
 {
     console.log("Working :)");
@@ -8,7 +9,6 @@ ws.onOpen = function (event)
 };
 
 setTimeout(function() {ws.send("Here's some text that the server is urgently awaiting!");}, 1000)
-
 
 ws.onmessage = function (event) 
 {
@@ -83,10 +83,6 @@ var LineMax1 = 3;
 var LineMax2 = LineMax1;
 var BoardNum = 3;
 
-var y = 10;
-var hy = 0;
-var T = 0;
-var L = 0;
 function drawGrid(x, y, size) 
 {
 
@@ -114,7 +110,7 @@ for (var x = 0; x < 3; x++)
     }
 }
 
-ctx.strokeStyle = "#0000FF";
+ctx.strokeStyle = "#FFFFFF";
 drawGrid(x, y, gridSeperation, 50);
 
 
