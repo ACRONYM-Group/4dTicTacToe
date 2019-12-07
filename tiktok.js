@@ -31,7 +31,7 @@ function sendText() {
 
 //Team
 //Recieve Team status from server
-var PlayerTeam
+var PlayerTeam = "X";
 
 var Team = document.getElementById("PlayerTeam");
 if(PlayerTeam == "X")
@@ -49,7 +49,7 @@ else
 
 //Turn management
 //Recieve turn status from server
-var IsTurn
+var IsTurn = "Yours";
 
 var Turn = document.getElementById("PlayerTurn");
 if (IsTurn == "Yours") {
@@ -64,8 +64,8 @@ else {
 
 //Drawing
 var canvas = document.getElementById("TicTacToe");
-canvas.width = window.innerWidth*.30;
-canvas.height = window.innerHeight*.35;
+canvas.width = 325;
+canvas.height = 325;
 
 var ctx = canvas.getContext("2d");
 
