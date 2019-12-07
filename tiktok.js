@@ -1,3 +1,4 @@
+console.log("working :)");
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
 ws.onOpen = function (event) {
@@ -52,13 +53,13 @@ var IsTurn
 
 var Turn = document.getElementById("PlayerTurn");
 if (IsTurn == "Yours") {
-    Team.innerHTML = "It is your turn.";
+    Turn.innerHTML = "It is your turn.";
 }
 else if (IsTurn == "Theirs") {
-    Team.innerHTML = "It is the enemy's turn.";
+    Turn.innerHTML = "It is the enemy's turn.";
 }
 else {
-    Team.innerHTML = "Oh god errors.";
+    Turn.innerHTML = "Oh god errors.";
 }
 
 //Drawing
