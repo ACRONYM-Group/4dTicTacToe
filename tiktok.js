@@ -28,8 +28,8 @@ function sendText() {
 }
 
 var canvas = document.getElementById("TicTacToe");
-canvas.width = window.innerWidth*.95;
-canvas.height = window.innerHeight*.95;
+canvas.width = window.innerWidth*.30;
+canvas.height = window.innerHeight*.35;
 
 var ctx = canvas.getContext("2d");
 
@@ -126,3 +126,17 @@ for (var x = 0; x < 3; x++) {
 ctx.strokeStyle = "#0000FF";
 drawGrid(x, y, gridSeperation, 50);
 
+/*ar MousePosX = 0;
+var MousePosY = 0;
+function GetMousePos(event) {
+    if(!(event.clientX && event.clientY == "undefined"))
+    {
+        MousePosX = event.clientX;
+        MousePosY = event.clientY;
+        console.log("X: " + MousePosX);
+        console.log("Y: " + MousePosX);
+    }
+
+document.addEventListener("click", GetMousePos);
+
+GetMousePos(); */
