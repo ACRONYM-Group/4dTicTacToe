@@ -1,5 +1,8 @@
-console.log("apple");
+console.log("Working :)");
 var c = document.getElementById("TicTacToe");
+c.width = window.innerWidth*.95;
+c.height = window.innerHeight*.95;
+
 var ctx = c.getContext("2d");
 var drawx = 40;
 var drawy = 40;
