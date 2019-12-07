@@ -1,11 +1,11 @@
 console.log("Working :)");
 webSocket = new WebSocket("wss://www.scienceandpizza.com:8000", "protocolOne");
 
-exampleSocket.onopen = function (event) {
-    exampleSocket.send("Here's some text that the server is urgently awaiting!");
+WebSocket.onopen = function (event) {
+    WebSocket.send("Here's some text that the server is urgently awaiting!");
 };
 
-exampleSocket.onmessage = function (event) {
+WebSocket.onmessage = function (event) {
     console.log(event.data);
 }
 
@@ -19,7 +19,7 @@ function sendText() {
     };
 
     // Send the msg object as a JSON-formatted string.
-    exampleSocket.send(JSON.stringify(msg));
+    WebSocket.send(JSON.stringify(msg));
 
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
@@ -32,17 +32,20 @@ c.height = window.innerHeight*.95;
 var ctx = c.getContext("2d");
 var drawx = 40;
 var drawy = 40;
-var Lmax = 8;
+var Lmax = 3;
 
 var y=10;
 var hy = 0;
 var T = 0;
-var gridnum = 9;
+
+var gridnum = 3;
 for(i=0; i<gridnum; i++){
 for (x=0; x<Lmax; x++) {
+
     //vert line draw
     ctx.moveTo(x*23.3+23.3+T*40*Lmax, y);
     ctx.lineTo(x*23.3+23.3+T*40*Lmax, y+23.3*Lmax+23.3);
+    
 // horizontal line draw
     ctx.moveTo(hy+T*40*Lmax, x*23.3+33.3);
     ctx.lineTo(hy+23.3*Lmax+23.3+T*40*Lmax, x*23.3+33.3);
