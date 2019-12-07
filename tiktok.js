@@ -11,7 +11,8 @@ var Lmax = 8;
 var y=10;
 var hy = 0;
 var T = 0;
-for(i=0; i<3; i++){
+var gridnum = 9;
+for(i=0; i<gridnum; i++){
 for (x=0; x<Lmax; x++) {
     //vert line draw
     ctx.moveTo(x*23.3+23.3+T*40*Lmax, y);
