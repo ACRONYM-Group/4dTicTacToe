@@ -25,30 +25,32 @@ function sendText() {
     document.getElementById("text").value = "";
 }
 
-var c = document.getElementById("TicTacToe");
-c.width = window.innerWidth*.95;
-c.height = window.innerHeight*.95;
+var canvas = document.getElementById("TicTacToe");
+canvas.width = window.innerWidth*.95;
+canvas.height = window.innerHeight*.95;
 
-var ctx = c.getContext("2d");
+var ctx = canvas.getContext("2d");
+
 var drawx = 40;
 var drawy = 40;
-var Lmax = 3;
 
-var y=10;
+var LineMax = 3;
+var BoardNum = 3;
+
+var y = 10;
 var hy = 0;
 var T = 0;
 
-var gridnum = 3;
-for(i=0; i<gridnum; i++){
-for (x=0; x<Lmax; x++) {
+for (i = 0; i < BoardNum; i++) {
+for (x = 0; x < LineMax; x++) {
 
     //vert line draw
-    ctx.moveTo(x*23.3+23.3+T*40*Lmax, y);
-    ctx.lineTo(x*23.3+23.3+T*40*Lmax, y+23.3*Lmax+23.3);
-    
+    ctx.moveTo(x * 23.3 + 23.3 + T * 40 * LineMax, y);
+    ctx.lineTo(x * 23.3 + 23.3 + T * 40 * LineMax, y + 23.3 * LineMax + 23.3);
+
 // horizontal line draw
-    ctx.moveTo(hy+T*40*Lmax, x*23.3+33.3);
-    ctx.lineTo(hy+23.3*Lmax+23.3+T*40*Lmax, x*23.3+33.3);
+    ctx.moveTo(hy + T * 40 * LineMax, x * 23.3 + 33.3);
+    ctx.lineTo(hy + 23.3 * LineMax + 23.3 + T * 40 * LineMax, x * 23.3 + 33.3);
     ctx.stroke(); 
 }
 T++
