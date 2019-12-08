@@ -62,7 +62,7 @@ def generateBoard():
     boardsData.append({"turn":"X"})
     print("BoardData " + str(boardsData))
 
-def generateToken():
+def generateToken(websocket):
     global nextTeamToAssign
     token = random.randint(1,10000)
     if token in users:
@@ -74,10 +74,12 @@ def generateToken():
     else:
         nextAvaliableBoard = len(boards)-1
 
-    users[token] = {"token":token, "team":nextTeamToAssign, "board":nextAvaliableBoard}
+    print("Assiging Team" + nextTeamToAssign)
+    users[token] = {"token":token, "team":nextTeamToAssign, "board":nextAvaliableBoard, "socket":websocket}
     if (nextTeamToAssign == "X"):
+        print("Next team will be O")
         nextTeamToAssign = "O"
-    if (nextTeamToAssign == "O"):
+    elif (nextTeamToAssign == "O"):
         nextTeamToAssign = "X"
     return token
     
@@ -158,7 +160,8 @@ async def commandHandler(msg, websocket):
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
-        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X", "token":generateToken()}))
+        newToken = generateToken(websocket)
+        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":users[newToken]["team"], "turn":boardsData[users[newToken]["board"]], "token":newToken}))
 
     if msg["cmdtype"] == "setCell":
         print(msg)
@@ -178,6 +181,9 @@ async def commandHandler(msg, websocket):
             print("aoaasda")
             print(msg["val"])
             await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
+            for u in users:
+                if users[u]["board"] == boardID:
+                    await users[u]["socket"].send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
 
     if (msg["cmdtype"] == "getCell"):
         await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
