@@ -39,7 +39,6 @@ function drawGrid(x, y, size) {
     }
 }
 
-
 ctx.strokeStyle = "#FF0088";
 for (var x = 0; x < 3; x++) {
     for (var y = 0; y < 3; y++) {
@@ -52,6 +51,7 @@ drawGrid(x, y, gridSeperation, size * 2);
 var S2 = 100;
 var S1 = 25;
 
+//Tracking clicking
 function getCursorPosition(canvas, event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -110,8 +110,8 @@ function trackclick() {
 
     console.log("BX:" + bx + " BY:" + by + " SX:" + sx + " SY:" + sy);
 }
-//Drawing every circle or square
 
+//Drawing every circle or square
 function DrawCircle(BigX, BigY, SmallX, SmallY) {
     ctx.beginPath();
     ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
@@ -226,10 +226,40 @@ ws.addEventListener("open", function (event) {
     );
 });
 
+
+var randomnum = 15
+
+switch(randomnum)
+{
+    case 15:
+        randomnum = 14;
+        break;
+    case 12:
+        not 
+        break;
+
+}
+
 ws.addEventListener("message", function (event) {
     console.log("Message from server ", event.data);
     var msg = JSON.parse(event.data);
     console.log(msg);
+
+    switch(msg["cmdtype"]) {
+        case "loginResponse":
+            loginToken = msg["token"];
+            break;
+
+        case "stateChange":
+            console.log(msg["coords"]);
+
+            console.log(msg["val"]);
+
+            break;
+
+        case "victoryEvent":
+        break;
+    }
 });
 
 function sendText() {
