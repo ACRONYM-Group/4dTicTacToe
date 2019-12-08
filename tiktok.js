@@ -232,7 +232,6 @@ ws.addEventListener("message", function (event) {
             SetTurnState(msg["turn"], msg["team"]);
             break;
         case "stateChange":
-            SetPlayerTeamText(msg["team"]);
             SetTurnState(msg["turn"], msg["team"]);
             if(msg["val"] == "X")
             {
