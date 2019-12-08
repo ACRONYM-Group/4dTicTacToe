@@ -216,10 +216,12 @@ function trackclick()
 function Fdrawx(){
     if(turn == true){
         console.log("heyo");
-        ctx.moveTo(cbx*S2+csx*S1, cby*S2+csy*S1);
-        ctx.lineTo(cbx*S2+(csx+1)*S1, cby*S2+(csy+1)*S1);
+        ctx.moveTo(cbx*S2+csx*S1+14, cby*S2+csy*S1+14);
+        ctx.lineTo(cbx*S2+(csx+1)*S1+14, cby*S2+(csy+1)*S1+14);
+        ctx.moveTo(cbx*S2+csx*S1+14, cby*S2+(csy+1)*S1+14);
+        ctx.lineTo(cbx*S2+(csx+1)*S1+14, cby*S2+csy*S1+14);
         ctx.stroke();
-        console.log(cbx*S2+csx*S1, cby*S2+csy*S1, cbx*S2+(csx+1)*S1, cby*S2+(csy+1)*S1 )
+        
     }
 }
 
@@ -227,6 +229,7 @@ var cbx =-1;
 var cby =-1;
 var csx =-1;
 var csy =-1;
+function coordcom(){
 if(bx== 11){
     cbx = 0
 }
@@ -246,12 +249,14 @@ if(sy == 11){
     csy = 0
 }
 if(sy==21){csy = 1}
-if (sy == 31){csy = 2}
+if (sy == 31){csy = 2}}
 
 canvas.addEventListener('mousedown', function(e) 
 {
     getCursorPosition(canvas, e);
     trackclick();
+    console.log(cbx+ cby+ csx+ csy);
+    coordcom();
     Fdrawx();
 })
 /*var MousePosX = 0;
@@ -292,5 +297,4 @@ function sendText() {
     ws.send(JSON.stringify(msg));
 
     // Blank the text input element, ready to receive the next line of text from the user.
-    document.getElementById("text").value = "";
-}
+    document.getElementById("text").value = "";*/
