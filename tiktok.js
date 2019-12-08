@@ -4,7 +4,6 @@ var by = 0;
 var sx = 0;
 var sy = 0;
 
-
 //Team
 //Recieve Team status from server
 var PlayerTeam = "X";
@@ -23,17 +22,20 @@ if (PlayerTeam == "X") {
 //Recieve turn status from server
 var IsTurn = "Yours";
 
-var Turn = document.getElementById("PlayerTurn");
-if (IsTurn == "Yours") {
-    Turn.innerHTML = "It is your turn.";
-} else if (IsTurn == "Theirs") {
-    Turn.innerHTML = "It is the enemy's turn.";
-} else if (IsTurn == "You won") {
-    Turn.innerHTML = "Victory! You have won!";
-} else if (IsTurn == "They Won") {
-    Turn.innerHTML = "Defeat! You have lost!";
-} else {
-    Turn.innerHTML = "Oh god errors.";
+function SetTurnState(IsTurn)
+{
+    var Turn = document.getElementById("PlayerTurn");
+    if (IsTurn == "Yours") {
+        Turn.innerHTML = "It is your turn.";
+    } else if (IsTurn == "Theirs") {
+        Turn.innerHTML = "It is the enemy's turn.";
+    } else if (IsTurn == "You won") {
+        Turn.innerHTML = "Victory! You have won!";
+    } else if (IsTurn == "They Won") {
+        Turn.innerHTML = "Defeat! You have lost!";
+    } else {
+        Turn.innerHTML = "Oh god errors.";
+    }
 }
 
 //Drawing
@@ -45,7 +47,7 @@ var ctx = canvas.getContext("2d");
 var cx = 0;
 var cy = 0;
 
-var size = 25
+var size = 25;
 
 var drawx = 40;
 var drawy = 40;
@@ -55,7 +57,6 @@ var LineMax2 = LineMax1;
 var BoardNum = 3;
 
 function drawGrid(x, y, size) {
-
     for (var i = 0; i < 2; i++) {
         ctx.beginPath();
         ctx.moveTo(x + size * (i + 1), y);
@@ -66,7 +67,6 @@ function drawGrid(x, y, size) {
         ctx.lineTo(x + size * 3, y + size * (i + 1));
         ctx.stroke();
     }
-
 }
 
 gridSeperation = 100;
@@ -83,18 +83,18 @@ var S2 = 100;
 var S1 = 25;
 
 function getCursorPosition(canvas, event) {
-    const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
     cx = x;
     cy = y;
 }
 
 //Figuring out where you clicked
-canvas.addEventListener('mousedown', function (e) {
+canvas.addEventListener("mousedown", function (e) {
     getCursorPosition(canvas, e);
     trackclick();
-})
+});
 
 function trackclick() {
     for (bx = 0; bx < 3;) {
@@ -138,13 +138,21 @@ function trackclick() {
         }
         sy++;
     }
-    console.log("BX:" + bx + " BY:" + by + " SX:" + sx + " SY:" + sy)
+    console.log("BX:" + bx + " BY:" + by + " SX:" + sx + " SY:" + sy);
 }
 
 function DrawCircle(BigX, BigY, SmallX, SmallY) {
-    ctx.beginPath();
-    ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
-    ctx.stroke();
+    if (turn == true) {
+        ctx.beginPath();
+        ctx.arc(
+            27.5 + size * SmallX + gridSeperation * BigX,
+            27.5 + size * SmallY + gridSeperation * BigY,
+            9,
+            0,
+            2 * Math.PI
+        );
+        ctx.stroke();
+    }
 }
 
 function Fdrawx() {
@@ -155,7 +163,6 @@ function Fdrawx() {
         ctx.moveTo(cbx * S2 + csx * S1 + 14, cby * S2 + (csy + 1) * S1 + 14);
         ctx.lineTo(cbx * S2 + (csx + 1) * S1 + 14, cby * S2 + csy * S1 + 14);
         ctx.stroke();
-
     }
 }
 
@@ -203,38 +210,52 @@ function coordcom() {
     }
 }
 
-canvas.addEventListener('mousedown', function (e) {
+var boole = false;
+canvas.addEventListener("mousedown", function (e) {
     getCursorPosition(canvas, e);
     trackclick();
     console.log(cbx + cby + csx + csy);
     coordcom();
-    Fdrawx();
-})
+    boole = !boole;
+    if(boole) {
+        Fdrawx();
+    }else{
+        DrawCircle(cbx, cby, csx, csy);
+    }
+});
 
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
 
-ws.addEventListener('open', function (event) {
-    ws.send(JSON.stringify({
-        cmdtype: "login"
-    }));
-    ws.send(JSON.stringify({
-        cmdtype: "setCell",
-        coords: [0, 0, 0, 0],
-        val: "X"
-    }));
-    ws.send(JSON.stringify({
-        cmdtype: "getCell",
-        coords: [0, 0, 0, 0]
-    }));
-    ws.send(JSON.stringify({
-        cmdtype: "getCell",
-        coords: [0, 1, 0, 0]
-    }));
+ws.addEventListener("open", function (event) {
+    ws.send(
+        JSON.stringify({
+            cmdtype: "login"
+        })
+    );
+    ws.send(
+        JSON.stringify({
+            cmdtype: "setCell",
+            coords: [0, 0, 0, 0],
+            val: "X"
+        })
+    );
+    ws.send(
+        JSON.stringify({
+            cmdtype: "getCell",
+            coords: [0, 0, 0, 0]
+        })
+    );
+    ws.send(
+        JSON.stringify({
+            cmdtype: "getCell",
+            coords: [0, 1, 0, 0]
+        })
+    );
 });
 
-ws.addEventListener('message', function (event) {
-    console.log('Message from server ', event.data);
+ws.addEventListener("message", function (event) {
+    console.log("Message from server ", event.data);
 });
 
 function sendText() {
