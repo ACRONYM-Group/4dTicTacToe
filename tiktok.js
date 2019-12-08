@@ -5,6 +5,7 @@ var bx = 0;
 var by = 0;
 var sx = 0;
 var sy = 0;
+var loginToken = 0;
 
 //Drawing
 var canvas = document.getElementById("TicTacToe");
@@ -116,11 +117,6 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
     ctx.beginPath();
     ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
     ctx.stroke();
-    ws.send(JSON.stringify({
-        cmdtype: "setCell",
-        coords: [bx, by, sx, sy],
-        val: "O"
-    }));
 }
 
 function Fdrawx(BigX, BigY, SmallX, SmallY) {
@@ -151,6 +147,12 @@ canvas.addEventListener("mousedown", function (e) {
         if (boole) {
         Fdrawx(bx, by, sx, sy);
         } else {
+            ws.send(JSON.stringify({
+                cmdtype: "setCell",
+                coords: [bx, by, sx, sy],
+                val: "O",
+                token: loginTokenz
+            }));
             DrawCircle(bx, by, sx, sy);
         }
     } else {
@@ -205,13 +207,13 @@ ws.addEventListener("open", function (event) {
             cmdtype: "login"
         })
     );
-    ws.send(
-        JSON.stringify({
-            cmdtype: "setCell",
-            coords: [0, 0, 0, 0],
-            val: "X"
-        })
-    );
+    // ws.send(
+    //     JSON.stringify({
+    //         cmdtype: "setCell",
+    //         coords: [0, 0, 0, 0],
+    //         val: "X"
+    //     })
+    // );
     ws.send(
         JSON.stringify({
             cmdtype: "getCell",

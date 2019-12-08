@@ -7,6 +7,8 @@ import json
 numDimensions = 3
 width = 3
 winLocation = []
+nextTeamToAssign = "X"
+boards = []
 
 def createDimension(itNum=0):
     dimension = {}
@@ -35,23 +37,37 @@ def createDimension(itNum=0):
 
     return dimension
 
-boardState = createDimension()
+boards.append(createDimension())
+users = {}
 
-#print(boardState)
+def getCell(coords, boardID):
+    return boards[boardID][coords[0]][coords[1]][coords[2]][coords[3]]
 
-def getCell(coords):
-    return boardState[coords[0]][coords[1]][coords[2]][coords[3]]
-
-def setCell(coords, val, i=0):
+def setCell(coords, val, boardID):
+    i = 0
     #[0, 1, 1]
-    subArrayString = "boardState"
+    subArrayString = "boards[" + boardID + "]"
     while i < len(coords):
         subArrayString += "[" + str(coords[i]) + "]"
         i += 1
 
     exec(str(subArrayString) + " = val")
 
-def checkVictory():
+def generateToken():
+    token = random.randint(1,10000)
+    if token in users:
+        token = generateToken()
+
+    if boards[len(boards)-1]["numPlay"]
+    users[token] = {"token":token, "team":nextTeamToAssign, board:nextAvaliableBoard}
+    if (nextTeamToAssign == "X"):
+        nextTeamToAssign = "O"
+    if (nextTeamToAssign == "O"):
+        nextTeamToAssign = "X"
+    return token
+    
+
+def checkVictory(boardID):
     foundWinCondition = False
     winner = 15
     bx = 0
@@ -63,7 +79,7 @@ def checkVictory():
                 sy = 0
                 while sy < width:
                     hasWrittenAnything = False
-                    returnData = checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything)
+                    returnData = checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything, boardID)
                     if (returnData[0] == True):
                         foundWinCondition = returnData[0]
                         winner = returnData[1]
@@ -76,7 +92,7 @@ def checkVictory():
     return [foundWinCondition, winner]
 
 hasWrittenAnything = False
-def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything):
+def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything, boardID):
     foundWinCondition = False
     adjacentCells = []
     focusbx = -1
@@ -89,10 +105,11 @@ def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything):
                 while focussy > -2 and focussy < 2:
                     if (bx+focusbx > -1 and bx+focusbx < width and by+focusby > -1 and by+focusby < width and sx+focussx > -1 and sx+focussx < width and sy+focussy > -1 and sy+focussy < width and (abs(focusbx) + abs(focusby) + abs(focussx) + abs(focussy) != 0)):
                         
-                        if (boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy] == boardState[bx][by][sx][sy]):
+                        if (boards[boardID][bx+focusbx][by+focusby][sx+focussx][sy+focussy] == boards[boardID][bx][by][sx][sy]):
                             #print("Adjacent Found " + str([bx+focusbx, by+focusby, sx+focussx, sy+focussy]))
-                            print(boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy])
-                            adjacentCells.append([focusbx, focusby, focussx, focussy, boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy], bx, by, sx, sy])
+                            testVar = [focusbx, focusby, focussx, focussy, boards[boardID][bx+focusbx][by+focusby][sx+focussx][sy+focussy], bx, by, sx, sy]
+                            #print(testVar)
+                            adjacentCells.append(testVar)
                     focussy += 1
 
                 focussx += 1
@@ -107,13 +124,14 @@ def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything):
     winner = 0
     for i in adjacentCells:
         for k in adjacentCells:
-            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3] and i[4] == boardState[i[5]][i[6]][i[7]][i[8]] and i[4] != 0 and i[4] != 1:
+            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3] and i[4] == boards[boardID][i[5]][i[6]][i[7]][i[8]] and i[4] != 0 and i[4] != 1:
+                print(i)
                 foundWinCondition = True
                 winner = i[4]
                 hasWrittenAnything = True
                 winLocation = [i[5], i[6], i[7], i[8]]
                 print("WIN")
-                print(winLocation + i)
+                print(str(winLocation) + " " + str(i))
     if (hasWrittenAnything):
         print("----")
     if (not foundWinCondition):
@@ -125,16 +143,19 @@ async def commandHandler(msg, websocket):
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
-        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X"}))
+        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X"m "token":generateToken()}))
 
     if msg["cmdtype"] == "setCell":
         setCell(msg["coords"], msg["val"])
-        victory = checkVictory()
+        print(msg["val"])
+        victory = checkVictory(users[msg["token"]]["board"])
         if victory[0]:
             print(str(victory[1]) + " HAS WON THE MATCH! at " + str(winLocation))
 
+        await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"]}))
+
     if (msg["cmdtype"] == "getCell"):
-        await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"])}))
+        await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
 
 
 # setCell([2, 1, 1, 1], "X")
