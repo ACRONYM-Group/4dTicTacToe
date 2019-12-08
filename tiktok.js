@@ -6,36 +6,43 @@ var sy = 0;
 
 //Team
 //Recieve Team status from server
-var PlayerTeam = "X";
-var turn = true;
-
-var Team = document.getElementById("PlayerTeam");
-if (PlayerTeam == "X") {
-    Team.innerHTML = "You are: X";
-} else if (PlayerTeam == "O") {
-    Team.innerHTML = "You are: O";
-} else {
-    Team.innerHTML = "Oh god errors.";
+function SetPlayerTeam(PlayerTeam)
+{
+    var Team = document.getElementById("PlayerTeam");
+    if (!PlayerTeam) {
+        Team.innerHTML = "You are: X";
+    } else if (PlayerTeam) {
+        Team.innerHTML = "You are: O";
+    } else {
+        Team.innerHTML = "Oh god errors.";
+    }
 }
 
 //Turn management
 //Recieve turn status from server
-var IsTurn = "Yours";
+
+var turn;
 
 function SetTurnState(IsTurn)
 {
     var Turn = document.getElementById("PlayerTurn");
-    if (IsTurn == "Yours") {
+    if (IsTurn) {
         Turn.innerHTML = "It is your turn.";
-    } else if (IsTurn == "Theirs") {
+    } else if (!IsTurn) {
         Turn.innerHTML = "It is the enemy's turn.";
-    } else if (IsTurn == "You won") {
-        Turn.innerHTML = "Victory! You have won!";
-    } else if (IsTurn == "They Won") {
-        Turn.innerHTML = "Defeat! You have lost!";
     } else {
         Turn.innerHTML = "Oh god errors.";
     }
+}
+function CheckTurnState()
+{
+
+}
+
+//CheckWin
+function CheckWinState()
+{
+
 }
 
 //Drawing
@@ -142,7 +149,7 @@ function trackclick() {
 }
 
 function DrawCircle(BigX, BigY, SmallX, SmallY) {
-    if (turn == true) {
+    //if (turn == true) {
         ctx.beginPath();
         ctx.arc(
             27.5 + size * SmallX + gridSeperation * BigX,
@@ -152,18 +159,18 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
             2 * Math.PI
         );
         ctx.stroke();
-    }
+    //}
 }
 
 function Fdrawx() {
-    if (turn == true) {
+    //if (turn == true) {
         console.log("heyo");
         ctx.moveTo(cbx * S2 + csx * S1 + 14, cby * S2 + csy * S1 + 14);
         ctx.lineTo(cbx * S2 + (csx + 1) * S1 + 14, cby * S2 + (csy + 1) * S1 + 14);
         ctx.moveTo(cbx * S2 + csx * S1 + 14, cby * S2 + (csy + 1) * S1 + 14);
         ctx.lineTo(cbx * S2 + (csx + 1) * S1 + 14, cby * S2 + csy * S1 + 14);
         ctx.stroke();
-    }
+    //}
 }
 
 var cbx = -1;
@@ -217,11 +224,13 @@ canvas.addEventListener("mousedown", function (e) {
     console.log(cbx + cby + csx + csy);
     coordcom();
     boole = !boole;
+    SetPlayerTeam(boole)
     if(boole) {
         Fdrawx();
     }else{
         DrawCircle(cbx, cby, csx, csy);
     }
+
 });
 
 //Networking
