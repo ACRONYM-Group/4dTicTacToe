@@ -202,6 +202,7 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
     ctx.beginPath();
     ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
     ctx.stroke();
+    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [cbx, cby, csx, csy], val: "O" }));
 }
 
 function Fdrawx(){
@@ -212,7 +213,7 @@ function Fdrawx(){
         ctx.moveTo(cbx*S2+csx*S1+14, cby*S2+(csy+1)*S1+14);
         ctx.lineTo(cbx*S2+(csx+1)*S1+14, cby*S2+csy*S1+14);
         ctx.stroke();
-        
+        ws.send(JSON.stringify({ cmdtype: "setCell", coords: [cbx, cby, csx, csy], val: "X" }));
     }
 }
 
@@ -266,7 +267,7 @@ ws = new WebSocket("ws://127.0.0.1:8000");
 
 ws.addEventListener('open', function (event) {
     ws.send(JSON.stringify({ cmdtype: "login" }));
-    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [0, 0, 0, 0], val: "X" }));
+   
     ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 0, 0, 0] }));
     ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 1, 0, 0] }));
 });
