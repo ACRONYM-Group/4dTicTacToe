@@ -126,12 +126,6 @@ function Fdrawx(BigX, BigY, SmallX, SmallY) {
     ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
     ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + SmallY * S1 + 14);
     ctx.stroke();
-
-    ws.send(JSON.stringify({
-        cmdtype: "setCell",
-        coords: [bx, by, sx, sy],
-        val: "X"
-    }));
 }
 
 //On every click \/
