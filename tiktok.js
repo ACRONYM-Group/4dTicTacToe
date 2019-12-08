@@ -1,12 +1,14 @@
 console.log("working :)");
+ws = new WebSocket("ws://127.0.0.1:8000");
+
 var bx = 0;
 var by = 0;
 var sx = 0;
 var sy = 0;
 
 //Team
-//Recieve Team status from server
-function SetPlayerTeam(PlayerTeam) {
+//Recieve Team status from server at start of communication
+function SetPlayerTeamText(PlayerTeam) {
     var Team = document.getElementById("PlayerTeam");
     if (!PlayerTeam) {
         Team.innerHTML = "You are: X";
@@ -19,9 +21,6 @@ function SetPlayerTeam(PlayerTeam) {
 
 //Turn management
 //Recieve turn status from server
-
-var turn;
-
 function SetTurnState(IsTurn) {
     var Turn = document.getElementById("PlayerTurn");
     if (IsTurn) {
@@ -33,13 +32,16 @@ function SetTurnState(IsTurn) {
     }
 }
 
-function CheckTurnState() {
-
-}
-
-//CheckWin
-function CheckWinState() {
-
+//Victory set
+//Recieve victory condition from server
+function SetWinState(Who) {
+    var Turn = document.getElementById("PlayerTurn");
+    if (Who == "You")
+    {
+        Turn.innerHTML = "Victory! You have won!";
+    } else {
+        Turn.innerHTML = "Defeat! You have lost!";
+    }
 }
 
 //Drawing
@@ -56,7 +58,9 @@ var size = 25;
 var drawx = 40;
 var drawy = 40;
 
+gridSeperation = 100;
 var LineMax1 = 3;
+
 var LineMax2 = LineMax1;
 var BoardNum = 3;
 
@@ -73,7 +77,7 @@ function drawGrid(x, y, size) {
     }
 }
 
-gridSeperation = 100;
+
 ctx.strokeStyle = "#FF0088";
 for (var x = 0; x < 3; x++) {
     for (var y = 0; y < 3; y++) {
@@ -93,12 +97,6 @@ function getCursorPosition(canvas, event) {
     cx = x;
     cy = y;
 }
-
-//Figuring out where you clicked
-canvas.addEventListener("mousedown", function (e) {
-    getCursorPosition(canvas, e);
-    trackclick();
-});
 
 function trackclick() {
     for (bx = 0; bx < 3;) {
@@ -182,7 +180,7 @@ canvas.addEventListener("mousedown", function (e) {
     trackclick();
     if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) {
         boole = !boole;
-        SetPlayerTeam(boole)
+        SetPlayerTeamText(boole)
         if (boole) {
             Fdrawx();
         } else {
@@ -195,8 +193,6 @@ canvas.addEventListener("mousedown", function (e) {
 });
 
 //Networking
-ws = new WebSocket("ws://127.0.0.1:8000");
-
 ws.addEventListener("open", function (event) {
     ws.send(
         JSON.stringify({
@@ -226,6 +222,8 @@ ws.addEventListener("open", function (event) {
 
 ws.addEventListener("message", function (event) {
     console.log("Message from server ", event.data);
+    var msg = JSON.parse(event.data);
+    console.log(msg);
 });
 
 function sendText() {
@@ -243,3 +241,30 @@ function sendText() {
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
 }
+
+
+
+/*var f = document.getElementById("chatbox").contentDocument;
+var text = "";
+var msg = JSON.parse(event.data);
+var time = new Date(msg.date);
+var timeStr = time.toLocaleTimeString();
+
+switch (msg.type) {
+    case "team":
+        clientID = msg.id;
+        setUsername();
+        break;
+    case "board changes":
+        text = "<b>User <em>" + msg.name + "</em> signed in at " + timeStr + "</b><br>";
+        break;
+    case "win":
+        text = "(" + timeStr + ") <b>" + msg.name + "</b>: " + msg.text + "<br>";
+        break;
+        break;
+}
+
+if (text.length) {
+    f.write(text);
+    document.getElementById("chatbox").contentWindow.scrollByPages(1);
+};*/
