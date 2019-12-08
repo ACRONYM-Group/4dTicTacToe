@@ -6,44 +6,6 @@ var by = 0;
 var sx = 0;
 var sy = 0;
 
-//Team
-//Recieve Team status from server at start of communication
-function SetPlayerTeamText(PlayerTeam) {
-    var Team = document.getElementById("PlayerTeam");
-    if (!PlayerTeam) {
-        Team.innerHTML = "You are: X";
-    } else if (PlayerTeam) {
-        Team.innerHTML = "You are: O";
-    } else {
-        Team.innerHTML = "Oh god errors.";
-    }
-}
-
-//Turn management
-//Recieve turn status from server
-function SetTurnState(IsTurn) {
-    var Turn = document.getElementById("PlayerTurn");
-    if (IsTurn) {
-        Turn.innerHTML = "It is your turn.";
-    } else if (!IsTurn) {
-        Turn.innerHTML = "It is the enemy's turn.";
-    } else {
-        Turn.innerHTML = "Oh god errors.";
-    }
-}
-
-//Victory set
-//Recieve victory condition from server
-function SetWinState(Who) {
-    var Turn = document.getElementById("PlayerTurn");
-    if (Who == "You")
-    {
-        Turn.innerHTML = "Victory! You have won!";
-    } else {
-        Turn.innerHTML = "Defeat! You have lost!";
-    }
-}
-
 //Drawing
 var canvas = document.getElementById("TicTacToe");
 canvas.width = 325;
@@ -147,6 +109,7 @@ function trackclick() {
 
     console.log("BX:" + bx + " BY:" + by + " SX:" + sx + " SY:" + sy);
 }
+//Drawing every circle or square
 
 function DrawCircle(BigX, BigY, SmallX, SmallY) {
     ctx.beginPath();
@@ -159,20 +122,34 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
     }));
 }
 
-function Fdrawx() {
-    ctx.moveTo(bx * S2 + sx * S1 + 14, by * S2 + sy * S1 + 14);
-    ctx.lineTo(bx * S2 + (sx + 1) * S1 + 14, by * S2 + (sy + 1) * S1 + 14);
-    ctx.moveTo(bx * S2 + sx * S1 + 14, by * S2 + (sy + 1) * S1 + 14);
-    ctx.lineTo(bx * S2 + (sx + 1) * S1 + 14, by * S2 + sy * S1 + 14);
+function Fdrawx(BigX, BigY, SmallX, SmallY) {
+    ctx.beginPath();
+    ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + SmallY * S1 + 14);
+    ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
+    ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
+    ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + SmallY * S1 + 14);
     ctx.stroke();
+
+
     ws.send(JSON.stringify({
         cmdtype: "setCell",
         coords: [bx, by, sx, sy],
         val: "X"
     }));
 }
-
+function FdrawxClear(BigX, BigY, SmallX, SmallY) {
+    ctx.beginPath();
+    ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + SmallY * S1 + 14);
+    ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
+    ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
+    ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + SmallY * S1 + 14);
+    ctx.strokeStyle = "#333333";
+    ctx.stroke();
+    ctx.strokeStyle = "#FFFFFF";
+}
+//On every click \/
 var boole = false;
+var boole2 = false;
 canvas.addEventListener("mousedown", function (e) {
 
     getCursorPosition(canvas, e);
@@ -182,7 +159,13 @@ canvas.addEventListener("mousedown", function (e) {
         boole = !boole;
         SetPlayerTeamText(boole)
         if (boole) {
-            Fdrawx();
+            if(boole2) {
+                Fdrawx(bx, by, sx, sy);
+                boole2 = !boole2;
+            } else {
+                FdrawxClear(bx, by, sx, sy);
+                boole2 = !boole2;
+            }
         } else {
             DrawCircle(bx, by, sx, sy);
         }
@@ -191,6 +174,45 @@ canvas.addEventListener("mousedown", function (e) {
     }
 
 });
+
+//Team
+//Recieve Team status from server at start of communication
+function SetPlayerTeamText(PlayerTeam) {
+    var Team = document.getElementById("PlayerTeam");
+    if (!PlayerTeam) {
+        Team.innerHTML = "You are: X";
+    } else if (PlayerTeam) {
+        Team.innerHTML = "You are: O";
+    } else {
+        Team.innerHTML = "Oh god errors.";
+    }
+}
+
+//Turn management
+//Recieve turn status from server
+function SetTurnState(IsTurn) {
+    var Turn = document.getElementById("PlayerTurn");
+    if (IsTurn) {
+        Turn.innerHTML = "It is your turn.";
+    } else if (!IsTurn) {
+        Turn.innerHTML = "It is the enemy's turn.";
+    } else {
+        Turn.innerHTML = "Oh god errors.";
+    }
+}
+
+//Victory set
+//Recieve victory condition from server
+function SetWinState(Who) {
+    var Turn = document.getElementById("PlayerTurn");
+    if (Who == "You") {
+        Turn.innerHTML = "Victory! You have won!";
+    } else if (Who == "Them") {
+        Turn.innerHTML = "Defeat! You have lost!";
+    } else {
+        Turn.innerHTML = "Tie! No one won!";
+    }
+}
 
 //Networking
 ws.addEventListener("open", function (event) {
@@ -237,32 +259,27 @@ function sendText() {
 
     // Send the msg object as a JSON-formatted string.
     ws.send(JSON.stringify(msg));
+    switch (msg.type) {
+        case "team":
+
+            break;
+        case "board changes":
+            text = "<b>User <em>" + msg.name + "</em> signed in at " + timeStr + "</b><br>";
+            break;
+        case "win":
+            text = "(" + timeStr + ") <b>" + msg.name + "</b>: " + msg.text + "<br>";
+            break;
+    }
 
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
 }
-
-
 
 /*var f = document.getElementById("chatbox").contentDocument;
 var text = "";
 var msg = JSON.parse(event.data);
 var time = new Date(msg.date);
 var timeStr = time.toLocaleTimeString();
-
-switch (msg.type) {
-    case "team":
-        clientID = msg.id;
-        setUsername();
-        break;
-    case "board changes":
-        text = "<b>User <em>" + msg.name + "</em> signed in at " + timeStr + "</b><br>";
-        break;
-    case "win":
-        text = "(" + timeStr + ") <b>" + msg.name + "</b>: " + msg.text + "<br>";
-        break;
-        break;
-}
 
 if (text.length) {
     f.write(text);
