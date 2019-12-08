@@ -57,7 +57,9 @@ def generateToken():
     token = random.randint(1,10000)
     if token in users:
         token = generateToken()
-    users[token] = {"token":token, "team":nextTeamToAssign}
+
+    if boards[len(boards)-1]["numPlay"]
+    users[token] = {"token":token, "team":nextTeamToAssign, board:nextAvaliableBoard}
     if (nextTeamToAssign == "X"):
         nextTeamToAssign = "O"
     if (nextTeamToAssign == "O"):
@@ -65,7 +67,7 @@ def generateToken():
     return token
     
 
-def checkVictory():
+def checkVictory(boardID):
     foundWinCondition = False
     winner = 15
     bx = 0
@@ -77,7 +79,7 @@ def checkVictory():
                 sy = 0
                 while sy < width:
                     hasWrittenAnything = False
-                    returnData = checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything)
+                    returnData = checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything, boardID)
                     if (returnData[0] == True):
                         foundWinCondition = returnData[0]
                         winner = returnData[1]
