@@ -6,8 +6,7 @@ var sy = 0;
 
 //Team
 //Recieve Team status from server
-function SetPlayerTeam(PlayerTeam)
-{
+function SetPlayerTeam(PlayerTeam) {
     var Team = document.getElementById("PlayerTeam");
     if (!PlayerTeam) {
         Team.innerHTML = "You are: X";
@@ -23,8 +22,7 @@ function SetPlayerTeam(PlayerTeam)
 
 var turn;
 
-function SetTurnState(IsTurn)
-{
+function SetTurnState(IsTurn) {
     var Turn = document.getElementById("PlayerTurn");
     if (IsTurn) {
         Turn.innerHTML = "It is your turn.";
@@ -34,14 +32,13 @@ function SetTurnState(IsTurn)
         Turn.innerHTML = "Oh god errors.";
     }
 }
-function CheckTurnState()
-{
+
+function CheckTurnState() {
 
 }
 
 //CheckWin
-function CheckWinState()
-{
+function CheckWinState() {
 
 }
 
@@ -145,6 +142,11 @@ function trackclick() {
         }
         sy++;
     }
+    sx = (sx - 1) / 10 - 1;
+    sy = (sy - 1) / 10 - 1;
+    bx = (bx - 1) / 10 - 1;
+    by = (by - 1) / 10 - 1;
+
     console.log("BX:" + bx + " BY:" + by + " SX:" + sx + " SY:" + sy);
 }
 
@@ -152,77 +154,42 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
     ctx.beginPath();
     ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
     ctx.stroke();
-    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [cbx, cby, csx, csy], val: "O" }));
+    ws.send(JSON.stringify({
+        cmdtype: "setCell",
+        coords: [bx, by, sx, sy],
+        val: "O"
+    }));
 }
 
 function Fdrawx() {
-    //if (turn == true) {
-        console.log("heyo");
-        ctx.moveTo(cbx * S2 + csx * S1 + 14, cby * S2 + csy * S1 + 14);
-        ctx.lineTo(cbx * S2 + (csx + 1) * S1 + 14, cby * S2 + (csy + 1) * S1 + 14);
-        ctx.moveTo(cbx * S2 + csx * S1 + 14, cby * S2 + (csy + 1) * S1 + 14);
-        ctx.lineTo(cbx * S2 + (csx + 1) * S1 + 14, cby * S2 + csy * S1 + 14);
-        ctx.stroke();
-        ws.send(JSON.stringify({ cmdtype: "setCell", coords: [cbx, cby, csx, csy], val: "X" }));
-    }
-
-
-var cbx = -1;
-var cby = -1;
-var csx = -1;
-var csy = -1;
-
-function coordcom() {
-    if (bx == 11) {
-        cbx = 0;
-    }
-    if (bx == 21) {
-        cbx = 1;
-    }
-    if (bx == 31) {
-        cbx = 2;
-    }
-    if (by == 11) {
-        cby = 0;
-    }
-    if (by == 21) {
-        cby = 1;
-    }
-    if (by == 31) {
-        cby = 2;
-    }
-    if (sx == 11) {
-        csx = 0;
-    }
-    if (sx == 21) {
-        csx = 1;
-    }
-    if (sx == 31) {
-        csx = 2;
-    }
-    if (sy == 11) {
-        csy = 0;
-    }
-    if (sy == 21) {
-        csy = 1;
-    }
-    if (sy == 31) {
-        csy = 2;
-    }
+    ctx.moveTo(bx * S2 + sx * S1 + 14, by * S2 + sy * S1 + 14);
+    ctx.lineTo(bx * S2 + (sx + 1) * S1 + 14, by * S2 + (sy + 1) * S1 + 14);
+    ctx.moveTo(bx * S2 + sx * S1 + 14, by * S2 + (sy + 1) * S1 + 14);
+    ctx.lineTo(bx * S2 + (sx + 1) * S1 + 14, by * S2 + sy * S1 + 14);
+    ctx.stroke();
+    ws.send(JSON.stringify({
+        cmdtype: "setCell",
+        coords: [bx, by, sx, sy],
+        val: "X"
+    }));
 }
 
 var boole = false;
 canvas.addEventListener("mousedown", function (e) {
+
     getCursorPosition(canvas, e);
+
     trackclick();
-    console.log(cbx + cby + csx + csy);
-    coordcom();
-    boole = !boole;
-    SetPlayerTeam(boole)
-    if(boole) {
-        Fdrawx();
-    }else{
-        DrawCircle(cbx, cby, csx, csy);
+    if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) {
+        boole = !boole;
+        SetPlayerTeam(boole)
+        if (boole) {
+            Fdrawx();
+        } else {
+            DrawCircle(bx, by, sx, sy);
+        }
+    } else {
+        console.log("Cancelling draw move")
     }
 
 });
