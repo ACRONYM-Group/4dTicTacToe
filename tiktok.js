@@ -156,7 +156,7 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
     ctx.stroke();
     ws.send(JSON.stringify({
         cmdtype: "setCell",
-        coords: [cbx, cby, csx, csy],
+        coords: [bx, by, sx, sy],
         val: "O"
     }));
 }
@@ -167,6 +167,11 @@ function Fdrawx() {
     ctx.moveTo(bx * S2 + sx * S1 + 14, by * S2 + (sy + 1) * S1 + 14);
     ctx.lineTo(bx * S2 + (sx + 1) * S1 + 14, by * S2 + sy * S1 + 14);
     ctx.stroke();
+    ws.send(JSON.stringify({
+        cmdtype: "setCell",
+        coords: [bx, by, sx, sy],
+        val: "X"
+    }));
 }
 
 var boole = false;
