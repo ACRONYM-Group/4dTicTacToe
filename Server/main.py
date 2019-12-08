@@ -160,12 +160,8 @@ async def commandHandler(msg, websocket):
         await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X", "token":generateToken(nextTeamToAssign)}))
 
     if msg["cmdtype"] == "setCell":
+        print(msg)
         boardID = users[msg["token"]]["board"]
-        print(msg["token"])
-        print(users[msg["token"]])
-        print(boardID)
-        print(boards)
-        print(boardsData)
         if boardsData[boardID]["turn"] == users[msg["token"]]["team"]:
             setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
             print(msg["val"])
@@ -178,7 +174,8 @@ async def commandHandler(msg, websocket):
                 boardsData[boardID]["turn"] = "O"
             else:
                 boardsData[boardID]["turn"] = "X"
-
+            print("aoaasda")
+            print(msg["val"])
             await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
 
     if (msg["cmdtype"] == "getCell"):

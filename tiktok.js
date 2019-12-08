@@ -120,74 +120,67 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
 }
 
 function Fdrawx(BigX, BigY, SmallX, SmallY) {
+    console.log(BigX)
+    console.log(BigY)
+    console.log(SmallX)
+    console.log(SmallY)
     ctx.beginPath();
     ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + SmallY * S1 + 14);
     ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
     ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
     ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + SmallY * S1 + 14);
     ctx.stroke();
-
-    ws.send(JSON.stringify({
-        cmdtype: "setCell",
-        coords: [bx, by, sx, sy],
-        val: "X"
-    }));
 }
 
 //On every click \/
-var boole = false;
 canvas.addEventListener("mousedown", function (e) {
 
     getCursorPosition(canvas, e);
 
     trackclick();
-    if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) {
-        boole = !boole;
-        SetPlayerTeamText(boole)
-        if (boole) {
-            ws.send(JSON.stringify({
-                cmdtype: "setCell",
-                coords: [bx, by, sx, sy],
-                val: "X",
-                token: loginToken
-            }));
-        } else {
-            ws.send(JSON.stringify({
-                cmdtype: "setCell",
-                coords: [bx, by, sx, sy],
-                val: "O",
-                token: loginToken
-            }));
-        }
+    if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) 
+    {
+        console.log(loginToken);
+        ws.send(JSON.stringify({
+            cmdtype: "setCell",
+            coords: [bx, by, sx, sy],
+            val: PlayerTeam,
+            token: loginToken
+        }));
     } else {
         console.log("Cancelling draw move")
     }
 
 });
 
+var PlayerTeam = "";
+
 //Team
 //Recieve Team status from server at start of communication
-function SetPlayerTeamText(PlayerTeam) {
+function SetPlayerTeamText(playerTeam) {
     var Team = document.getElementById("PlayerTeam");
-    if ("X") {
+    if (playerTeam == "X") {
         Team.innerHTML = "You are: X";
-    } else if ("O") {
+    } else if (playerTeam == "O") {
         Team.innerHTML = "You are: O";
     } else {
         Team.innerHTML = "Errors.";
     }
+    PlayerTeam = playerTeam
 }
 
 //Turn management
 //Recieve turn status from server
 function SetTurnState(Turn, Team) {
-    var Turn = document.getElementById("PlayerTurn");
+    var TurnState = document.getElementById("PlayerTurn");
+    console.log(Team);
+    console.log(Turn);
     if (Turn == Team) {
-        Turn.innerHTML = "It is your turn.";
+        TurnState.innerHTML = "It is your turn.";
     } else if (!(Turn == Team)) {
-        Turn.innerHTML = "It is the enemy's turn.";
+        TurnState.innerHTML = "It is the enemy's turn.";
     } else {
-        Turn.innerHTML = "Errors.";
+        TurnState.innerHTML = "Errors.";
     }
 }
 
@@ -211,19 +204,6 @@ ws.addEventListener("open", function (event) {
             cmdtype: "login"
         })
     );
-    // ws.send(
-    //     JSON.stringify({
-    //         cmdtype: "setCell",
-    //         coords: [0, 0, 0, 0],
-    //         val: "X"
-    //     })
-    // );
-    // ws.send(
-    //     JSON.stringify({
-    //         cmdtype: "getCell",
-    //         coords: [0, 0, 0, 0]
-    //     })
-    // );
 });
 
 
@@ -256,10 +236,13 @@ ws.addEventListener("message", function (event) {
             SetTurnState(msg["turn"], msg["team"]);
             if(msg["val"] == "X")
             {
-                Fdrawx(msg["val"][0], msg["val"][1], msg["val"][2], msg["val"][3])
+                Fdrawx(msg["coords"][0], msg["coords"][1], msg["coords"][2], msg["coords"][3])
             } else if (msg["val"] == "O")
             {
-                DrawCircle(msg["val"][0], msg["val"][1], msg["val"][2], msg["val"][3])
+                DrawCircle(msg["coords"][0], msg["coords"][1], msg["coords"][2], msg["coords"][3])
+            }
+            else {
+                console.log("borked");
             }
             console.log(msg["coords"]);
             console.log(msg["val"]);
