@@ -62,10 +62,11 @@ def generateBoard():
     boardsData.append({"turn":"X"})
     print("BoardData " + str(boardsData))
 
-def generateToken(nextTeamToAssign):
+def generateToken():
+    global nextTeamToAssign
     token = random.randint(1,10000)
     if token in users:
-        token = generateToken(nextTeamToAssign)
+        token = generateToken()
 
     if len(boards) == len(users)/2:
         nextAvaliableBoard = len(boards)
@@ -157,15 +158,11 @@ async def commandHandler(msg, websocket):
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
-        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X", "token":generateToken(nextTeamToAssign)}))
+        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X", "token":generateToken()}))
 
     if msg["cmdtype"] == "setCell":
         boardID = users[msg["token"]]["board"]
-        print(msg["token"])
-        print(users[msg["token"]])
-        print(boardID)
-        print(boards)
-        print(boardsData)
+
         if boardsData[boardID]["turn"] == users[msg["token"]]["team"]:
             setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
             print(msg["val"])
