@@ -10,6 +10,7 @@ width = 3
 winLocation = []
 nextTeamToAssign = "X"
 boards = []
+boardsData = []
 
 def createDimension(itNum=0):
     dimension = {}
@@ -38,7 +39,7 @@ def createDimension(itNum=0):
 
     return dimension
 
-boards.append(createDimension())
+#boards.append(createDimension())
 users = {}
 
 def getCell(coords, boardID):
@@ -57,7 +58,9 @@ def setCell(coords, val, boardID):
     
 
 def generateBoard():
-    boards[len(boards)] = createDimension()
+    boards.append(createDimension())
+    boardsData.append({"turn":"X"})
+    print("BoardData " + str(boardsData))
 
 def generateToken(nextTeamToAssign):
     token = random.randint(1,10000)
@@ -158,7 +161,12 @@ async def commandHandler(msg, websocket):
 
     if msg["cmdtype"] == "setCell":
         boardID = users[msg["token"]]["board"]
-        if boardsData[boardID]["turn"] == users[msg["token"]]["turn"]:
+        print(msg["token"])
+        print(users[msg["token"]])
+        print(boardID)
+        print(boards)
+        print(boardsData)
+        if boardsData[boardID]["turn"] == users[msg["token"]]["team"]:
             setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
             print(msg["val"])
             victory = checkVictory(users[msg["token"]]["board"])
