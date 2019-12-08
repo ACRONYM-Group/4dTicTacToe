@@ -1,13 +1,14 @@
 console.log("working :)");
 ws = new WebSocket("ws://127.0.0.1:8000");
 
+var loginToken = 0;
+
+//Drawing
 var bx = 0;
 var by = 0;
 var sx = 0;
 var sy = 0;
-var loginToken = 0;
 
-//Drawing
 var canvas = document.getElementById("TicTacToe");
 canvas.width = 325;
 canvas.height = 325;
@@ -138,6 +139,7 @@ canvas.addEventListener("mousedown", function (e) {
     getCursorPosition(canvas, e);
 
     trackclick();
+    
     if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) 
     {
         console.log(loginToken);
@@ -206,30 +208,20 @@ ws.addEventListener("open", function (event) {
     );
 });
 
-
-var randomnum = 15
-
-switch(randomnum)
-{
-    case 15:
-        randomnum = 14;
-        break;
-    case 12:
-        not 
-        break;
-}
-
 ws.addEventListener("message", function (event) {
     console.log("Message from server ", event.data);
     var msg = JSON.parse(event.data);
     console.log(msg);
 
     switch(msg["cmdtype"]) {
+        //On Login/Websocket connection to server:
         case "loginResponse":
             loginToken = msg["token"];
-
+            //Get team and send it to SetPlayerTeamText
             SetPlayerTeamText(msg["team"]);
+            //Get turn and team and send it to SetTurnState
             SetTurnState(msg["turn"], msg["team"]);
+
             break;
         case "stateChange":
             SetTurnState(msg["turn"], msg["team"]);
@@ -248,11 +240,12 @@ ws.addEventListener("message", function (event) {
             break;
 
         case "victoryEvent":
+            SetWinState(msg[""])
         break;
     }
 });
 
-function sendText() {
+/*function sendText() {
     // Construct a msg object containing the data the server needs to process the message from the chat client.
     var msg = {
         type: "message",
@@ -277,4 +270,4 @@ function sendText() {
 
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
-}
+}*/
