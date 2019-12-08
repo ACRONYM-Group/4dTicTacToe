@@ -3,22 +3,7 @@ var bx = 0;
 var by = 0;
 var sx = 0;
 var sy = 0;
-function sendText() 
-{
-    // Construct a msg object containing the data the server needs to process the message from the chat client.
-    var msg = {
-        type: "message",
-        text: document.getElementById("text").value,
-        id: clientID,
-        date: Date.now()
-    };
 
-    // Send the msg object as a JSON-formatted string.
-    ws.send(JSON.stringify(msg));
-
-    // Blank the text input element, ready to receive the next line of text from the user.
-    document.getElementById("text").value = "";
-}
 
 //Team
 //Recieve Team status from server
@@ -194,7 +179,6 @@ function trackclick()
         }
         sy++;
     }
-
     console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
 }
 
@@ -216,31 +200,61 @@ function Fdrawx(){
     }
 }
 
-var cbx =-1;
-var cby =-1;
-var csx =-1;
-var csy =-1;
-function coordcom(){
-if(bx== 11){
-    cbx = 0
+var cbx = - 1;
+var cby = - 1;
+var csx = - 1;
+var csy = - 1;
+function coordcom()
+{
+    if(bx == 11)
+    {
+        cbx = 0;
+    }
+    if(bx == 21)
+    {
+        cbx = 1;
+    }
+    if (bx == 31)
+    {
+        cbx = 2;
+    }
+    if(by == 11)
+    {
+        cby = 0;
+    }
+    if(by == 21)
+    {
+        cby = 1;
+    }
+    if (by == 31)
+    {
+        cby = 2;
+    }
+    if(sx == 11)
+    {
+        csx = 0;
+    }
+    if(sx == 21)
+    {
+        csx = 1;
+    }
+    if (sx == 31)
+    {
+        csx = 2;
+    }
+    if(sy == 11)
+    {
+        csy = 0;
+    }
+    if(sy == 21)
+    {
+        csy = 1;
+    }
+    if (sy == 31)
+    {
+        csy = 2;
+    }
 }
-if(bx==21){cbx = 1}
-if (bx == 31){cbx = 2}
-if(by == 11){
-    cby = 0
-}
-if(by==21){cby = 1}
-if (by == 31){cby = 2}
-if(sx == 11){
-    csx = 0
-}
-if(sx==21){csx = 1}
-if (sx == 31){csx = 2}
-if(sy == 11){
-    csy = 0
-}
-if(sy==21){csy = 1}
-if (sy == 31){csy = 2}}
 
 canvas.addEventListener('mousedown', function(e) 
 {
@@ -251,16 +265,6 @@ canvas.addEventListener('mousedown', function(e)
     Fdrawx();
 })
 
-/*var MousePosX = 0;
-var MousePosY = 0;
-function GetMousePos(event) {
-    if(!(event.clientX && event.clientY == "undefined"))
-    {
-        MousePosX = event.clientX;
-        MousePosY = event.clientY;
-        console.log("X: " + MousePosX);
-        console.log("Y: " + MousePosX);
-    }*/
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
 
