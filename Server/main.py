@@ -6,6 +6,7 @@ import json
 
 numDimensions = 3
 width = 3
+winLocation = []
 
 def createDimension(itNum=0):
     dimension = {}
@@ -36,7 +37,7 @@ def createDimension(itNum=0):
 
 boardState = createDimension()
 
-print(boardState)
+#print(boardState)
 
 def getCell(coords):
     return boardState[coords[0]][coords[1]][coords[2]][coords[3]]
@@ -51,6 +52,8 @@ def setCell(coords, val, i=0):
     exec(str(subArrayString) + " = val")
 
 def checkVictory():
+    foundWinCondition = False
+    winner = 15
     bx = 0
     while bx < width:
         by = 0
@@ -61,8 +64,9 @@ def checkVictory():
                 while sy < width:
                     hasWrittenAnything = False
                     returnData = checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything)
-                    foundWinCondition = returnData[0]
-                    winner = returnData[1]
+                    if (returnData[0] == True):
+                        foundWinCondition = returnData[0]
+                        winner = returnData[1]
                     sy += 1
                 sx += 1
 
@@ -84,31 +88,40 @@ def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything):
                 focussy = -1
                 while focussy > -2 and focussy < 2:
                     if (bx+focusbx > -1 and bx+focusbx < width and by+focusby > -1 and by+focusby < width and sx+focussx > -1 and sx+focussx < width and sy+focussy > -1 and sy+focussy < width and (abs(focusbx) + abs(focusby) + abs(focussx) + abs(focussy) != 0)):
+                        
                         if (boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy] == boardState[bx][by][sx][sy]):
-                            adjacentCells.append([focusbx, focusby, focussx, focussy, boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy]])
+                            #print("Adjacent Found " + str([bx+focusbx, by+focusby, sx+focussx, sy+focussy]))
+                            print(boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy])
+                            adjacentCells.append([focusbx, focusby, focussx, focussy, boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy], bx, by, sx, sy])
                     focussy += 1
 
                 focussx += 1
             focusby +=1
         focusbx += 1
+
+
     
     
     hasWrittenAnything = False
+    foundWinCondition = False
+    winner = 0
     for i in adjacentCells:
         for k in adjacentCells:
-            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3] and i[4] != 0 and i[4] != 1:
+            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3] and i[4] == boardState[i[5]][i[6]][i[7]][i[8]] and i[4] != 0 and i[4] != 1:
                 foundWinCondition = True
-                print(i)
                 winner = i[4]
-                return [foundWinCondition, winner]
                 hasWrittenAnything = True
+                winLocation = [i[5], i[6], i[7], i[8]]
+                print("WIN")
+                print(winLocation + i)
     if (hasWrittenAnything):
         print("----")
-
-    return [False, 0]
+    if (not foundWinCondition):
+        return [False, 15]
+    else:
+        return [foundWinCondition, winner]
 
 async def commandHandler(msg, websocket):
-    print(msg["cmdtype"])
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
@@ -118,16 +131,19 @@ async def commandHandler(msg, websocket):
         setCell(msg["coords"], msg["val"])
         victory = checkVictory()
         if victory[0]:
-            print(str(victory[1]) + " HAS WON THE MATCH!")
+            print(str(victory[1]) + " HAS WON THE MATCH! at " + str(winLocation))
 
     if (msg["cmdtype"] == "getCell"):
         await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"])}))
 
 
+# setCell([2, 1, 1, 1], "X")
+# setCell([1, 1, 1, 1], "X")
+# setCell([0, 1, 1, 1], "X")
+checkIfInCenterOfLine(1, 1, 1, 1, False)
 
 async def echo(websocket, path):
     async for message in websocket:
-        print(message)
         await commandHandler(json.loads(message), websocket)
 
 
