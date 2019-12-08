@@ -20,7 +20,7 @@ var size = 25;
 var drawx = 40;
 var drawy = 40;
 
-gridSeperation = 100;
+var gridSeperation = 100;
 var LineMax1 = 3;
 
 var LineMax2 = LineMax1;
@@ -102,6 +102,7 @@ function trackclick() {
         }
         sy++;
     }
+
     sx = (sx - 1) / 10 - 1;
     sy = (sy - 1) / 10 - 1;
     bx = (bx - 1) / 10 - 1;
@@ -130,26 +131,15 @@ function Fdrawx(BigX, BigY, SmallX, SmallY) {
     ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + SmallY * S1 + 14);
     ctx.stroke();
 
-
     ws.send(JSON.stringify({
         cmdtype: "setCell",
         coords: [bx, by, sx, sy],
         val: "X"
     }));
 }
-function FdrawxClear(BigX, BigY, SmallX, SmallY) {
-    ctx.beginPath();
-    ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + SmallY * S1 + 14);
-    ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
-    ctx.moveTo(BigX * S2 + SmallX * S1 + 14, BigY * S2 + (SmallY + 1) * S1 + 14);
-    ctx.lineTo(BigX * S2 + (SmallX + 1) * S1 + 14, BigY * S2 + SmallY * S1 + 14);
-    ctx.strokeStyle = "#333333";
-    ctx.stroke();
-    ctx.strokeStyle = "#FFFFFF";
-}
+
 //On every click \/
 var boole = false;
-var boole2 = false;
 canvas.addEventListener("mousedown", function (e) {
 
     getCursorPosition(canvas, e);
@@ -159,13 +149,7 @@ canvas.addEventListener("mousedown", function (e) {
         boole = !boole;
         SetPlayerTeamText(boole)
         if (boole) {
-            if(boole2) {
-                Fdrawx(bx, by, sx, sy);
-                boole2 = !boole2;
-            } else {
-                FdrawxClear(bx, by, sx, sy);
-                boole2 = !boole2;
-            }
+        Fdrawx(bx, by, sx, sy);
         } else {
             DrawCircle(bx, by, sx, sy);
         }
@@ -274,14 +258,3 @@ function sendText() {
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
 }
-
-/*var f = document.getElementById("chatbox").contentDocument;
-var text = "";
-var msg = JSON.parse(event.data);
-var time = new Date(msg.date);
-var timeStr = time.toLocaleTimeString();
-
-if (text.length) {
-    f.write(text);
-    document.getElementById("chatbox").contentWindow.scrollByPages(1);
-};*/
