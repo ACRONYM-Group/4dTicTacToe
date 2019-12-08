@@ -139,14 +139,13 @@ canvas.addEventListener("mousedown", function (e) {
     getCursorPosition(canvas, e);
 
     trackclick();
-    
-    if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) 
-    {
+
+    if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) {
         console.log(loginToken);
         ws.send(JSON.stringify({
             cmdtype: "setCell",
             coords: [bx, by, sx, sy],
-            val: PlayerTeam,
+            val: PlayerTeamInternal,
             token: loginToken
         }));
     } else {
@@ -155,47 +154,52 @@ canvas.addEventListener("mousedown", function (e) {
 
 });
 
-var PlayerTeam = "";
+var PlayerTeamInternal = "";
 
 //Team
 //Recieve Team status from server at start of communication
-function SetPlayerTeamText(playerTeam) {
-    var Team = document.getElementById("PlayerTeam");
-    if (playerTeam == "X") {
-        Team.innerHTML = "You are: X";
-    } else if (playerTeam == "O") {
-        Team.innerHTML = "You are: O";
+function SetPlayerTeamText(PlayerTeam) {
+    var TeamText = document.getElementById("PlayerTeam");
+    PlayerTeamInternal = PlayerTeam;
+
+    if (PlayerTeam == "X") {
+        TeamText.innerHTML = "You are: X";
+    } else if (PlayerTeam == "O") {
+        TeamText.innerHTML = "You are: O";
     } else {
-        Team.innerHTML = "Errors.";
+        TeamText.innerHTML = "Errors.";
     }
-    PlayerTeam = playerTeam
 }
 
 //Turn management
 //Recieve turn status from server
 function SetTurnState(Turn, Team) {
-    var TurnState = document.getElementById("PlayerTurn");
-    console.log(Team);
-    console.log(Turn);
+    const TurnState = document.getElementById("PlayerTurn");
+    console.log(Turn.turn);
+    console.log(Turn, Team);
+    console.log(PlayerTeamInternal);
+
     if (Turn == Team) {
+        TurnState.innerHTML = "It is your turn.";
+    } else if ((Team == "X" && Turn.turn == "X") || (PlayerTeamInternal == "X" && Turn.turn == "X") || (PlayerTeamInternal == "X" && Turn == "X")) {
+        TurnState.innerHTML = "It is your turn.";
+    } else if ((Team == "O" && Turn.turn == "O") || (PlayerTeamInternal == "O" && Turn.turn == "O") || (PlayerTeamInternal == "O" && Turn == "O")) {
         TurnState.innerHTML = "It is your turn.";
     } else if (!(Turn == Team)) {
         TurnState.innerHTML = "It is the enemy's turn.";
-    } else {
-        TurnState.innerHTML = "Errors.";
     }
 }
 
 //Victory set
 //Recieve victory condition from server
 function SetWinState(Who) {
-    var Turn = document.getElementById("PlayerTurn");
+    const TurnState = document.getElementById("PlayerTurn");
     if (Who == "You") {
-        Turn.innerHTML = "Victory! You have won!";
+        TurnState.innerHTML = "Victory! You have won!";
     } else if (Who == "Them") {
-        Turn.innerHTML = "Defeat! You have lost!";
+        TurnState.innerHTML = "Defeat! You have lost!";
     } else {
-        Turn.innerHTML = "Tie! No one won!";
+        TurnState.innerHTML = "Tie! No one won!";
     }
 }
 
@@ -213,26 +217,28 @@ ws.addEventListener("message", function (event) {
     var msg = JSON.parse(event.data);
     console.log(msg);
 
-    switch(msg["cmdtype"]) {
+    switch (msg["cmdtype"]) {
         //On Login/Websocket connection to server:
         case "loginResponse":
             loginToken = msg["token"];
+
             //Get team and send it to SetPlayerTeamText
             SetPlayerTeamText(msg["team"]);
+
             //Get turn and team and send it to SetTurnState
             SetTurnState(msg["turn"], msg["team"]);
 
             break;
         case "stateChange":
+
             SetTurnState(msg["turn"], msg["team"]);
-            if(msg["val"] == "X")
-            {
+            console.log(msg["turn"], msg["team"]);
+
+            if (msg["val"] == "X") {
                 Fdrawx(msg["coords"][0], msg["coords"][1], msg["coords"][2], msg["coords"][3])
-            } else if (msg["val"] == "O")
-            {
+            } else if (msg["val"] == "O") {
                 DrawCircle(msg["coords"][0], msg["coords"][1], msg["coords"][2], msg["coords"][3])
-            }
-            else {
+            } else {
                 console.log("borked");
             }
             console.log(msg["coords"]);
@@ -241,7 +247,7 @@ ws.addEventListener("message", function (event) {
 
         case "victoryEvent":
             SetWinState(msg[""])
-        break;
+            break;
     }
 });
 

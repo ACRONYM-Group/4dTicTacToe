@@ -5,6 +5,8 @@ import pathlib
 import json
 import random
 
+print("Server online. ")
+
 numDimensions = 3
 width = 3
 winLocation = []
