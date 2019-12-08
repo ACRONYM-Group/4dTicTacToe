@@ -5,6 +5,7 @@ var bx = 0;
 var by = 0;
 var sx = 0;
 var sy = 0;
+var loginToken = 0;
 
 //Team
 //Recieve Team status from server at start of communication
@@ -152,11 +153,6 @@ function DrawCircle(BigX, BigY, SmallX, SmallY) {
     ctx.beginPath();
     ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
     ctx.stroke();
-    ws.send(JSON.stringify({
-        cmdtype: "setCell",
-        coords: [bx, by, sx, sy],
-        val: "O"
-    }));
 }
 
 function Fdrawx() {
@@ -172,7 +168,7 @@ function Fdrawx() {
     }));
 }
 
-var boole = false;
+var boole = true;
 canvas.addEventListener("mousedown", function (e) {
 
     getCursorPosition(canvas, e);
@@ -184,6 +180,12 @@ canvas.addEventListener("mousedown", function (e) {
         if (boole) {
             Fdrawx();
         } else {
+            ws.send(JSON.stringify({
+                cmdtype: "setCell",
+                coords: [bx, by, sx, sy],
+                val: "O",
+                token: loginTokenz
+            }));
             DrawCircle(bx, by, sx, sy);
         }
     } else {
@@ -199,13 +201,13 @@ ws.addEventListener("open", function (event) {
             cmdtype: "login"
         })
     );
-    ws.send(
-        JSON.stringify({
-            cmdtype: "setCell",
-            coords: [0, 0, 0, 0],
-            val: "X"
-        })
-    );
+    // ws.send(
+    //     JSON.stringify({
+    //         cmdtype: "setCell",
+    //         coords: [0, 0, 0, 0],
+    //         val: "X"
+    //     })
+    // );
     ws.send(
         JSON.stringify({
             cmdtype: "getCell",
@@ -224,6 +226,10 @@ ws.addEventListener("message", function (event) {
     console.log("Message from server ", event.data);
     var msg = JSON.parse(event.data);
     console.log(msg);
+
+    if (msg["cmdtype"] == "loginResponse") {
+        loginToken = msg["token"]
+    }
 });
 
 function sendText() {
