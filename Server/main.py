@@ -59,7 +59,8 @@ def checkVictory():
             while sx < width:
                 sy = 0
                 while sy < width:
-                    returnData = checkIfInCenterOfLine(bx, by, sx, sy)
+                    hasWrittenAnything = False
+                    returnData = checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything)
                     foundWinCondition = returnData[0]
                     winner = returnData[1]
                     sy += 1
@@ -70,8 +71,8 @@ def checkVictory():
     
     return [foundWinCondition, winner]
 
-
-def checkIfInCenterOfLine(bx, by, sx, sy):
+hasWrittenAnything = False
+def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything):
     foundWinCondition = False
     adjacentCells = []
     focusbx = -1
@@ -79,24 +80,32 @@ def checkIfInCenterOfLine(bx, by, sx, sy):
         focusby = -1
         while focusby > -2 and focusby < 2:
             focussx = -1
-            while focussx > -2 and focussy < 2:
+            while focussx > -2 and focussx < 2:
                 focussy = -1
                 while focussy > -2 and focussy < 2:
-                    if (boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy] == boardState[bx][by][sx][sy]):
-                        adjacentCells.append([focusbx, focusby, focussx, focussy])
+                    if (bx+focusbx > -1 and bx+focusbx < width and by+focusby > -1 and by+focusby < width and sx+focussx > -1 and sx+focussx < width and sy+focussy > -1 and sy+focussy < width and (abs(focusbx) + abs(focusby) + abs(focussx) + abs(focussy) != 0)):
+                        if (boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy] == boardState[bx][by][sx][sy]):
+                            adjacentCells.append([focusbx, focusby, focussx, focussy, boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy]])
                     focussy += 1
 
                 focussx += 1
             focusby +=1
-        focusbx += 
-        
+        focusbx += 1
+    
+    
+    hasWrittenAnything = False
     for i in adjacentCells:
         for k in adjacentCells:
-            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3]:
+            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3] and i[4] != 0 and i[4] != 1:
                 foundWinCondition = True
-                winner = boardState[i[0]][i[1]][i[2]][i[3]]
+                print(i)
+                winner = i[4]
+                return [foundWinCondition, winner]
+                hasWrittenAnything = True
+    if (hasWrittenAnything):
+        print("----")
 
-    return [foundWinCondition, winner]
+    return [False, 0]
 
 async def commandHandler(msg, websocket):
     print(msg["cmdtype"])
@@ -106,11 +115,10 @@ async def commandHandler(msg, websocket):
         await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X"}))
 
     if msg["cmdtype"] == "setCell":
-        print(msg["coords"])
         setCell(msg["coords"], msg["val"])
         victory = checkVictory()
         if victory[0]:
-            print(victory[1] + " HAS WON THE MATCH!")
+            print(str(victory[1]) + " HAS WON THE MATCH!")
 
     if (msg["cmdtype"] == "getCell"):
         await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"])}))
