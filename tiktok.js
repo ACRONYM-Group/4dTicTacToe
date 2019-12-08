@@ -165,25 +165,25 @@ canvas.addEventListener("mousedown", function (e) {
 //Recieve Team status from server at start of communication
 function SetPlayerTeamText(PlayerTeam) {
     var Team = document.getElementById("PlayerTeam");
-    if (!PlayerTeam) {
+    if ("X") {
         Team.innerHTML = "You are: X";
-    } else if (PlayerTeam) {
+    } else if ("O") {
         Team.innerHTML = "You are: O";
     } else {
-        Team.innerHTML = "Oh god errors.";
+        Team.innerHTML = "Errors.";
     }
 }
 
 //Turn management
 //Recieve turn status from server
-function SetTurnState(IsTurn) {
+function SetTurnState(Turn, Team) {
     var Turn = document.getElementById("PlayerTurn");
-    if (IsTurn) {
+    if (Turn == Team) {
         Turn.innerHTML = "It is your turn.";
-    } else if (!IsTurn) {
+    } else if (!(Turn == Team)) {
         Turn.innerHTML = "It is the enemy's turn.";
     } else {
-        Turn.innerHTML = "Oh god errors.";
+        Turn.innerHTML = "Errors.";
     }
 }
 
@@ -239,7 +239,6 @@ switch(randomnum)
     case 12:
         not 
         break;
-
 }
 
 ws.addEventListener("message", function (event) {
@@ -250,13 +249,22 @@ ws.addEventListener("message", function (event) {
     switch(msg["cmdtype"]) {
         case "loginResponse":
             loginToken = msg["token"];
+
+            SetPlayerTeamText(msg["team"]);
+            SetTurnState(msg["turn"], msg["team"]);
             break;
-
         case "stateChange":
+            SetPlayerTeamText(msg["team"]);
+            SetTurnState(msg["turn"], msg["team"]);
+            if(msg["val"] == "X")
+            {
+                Fdrawx(msg["val"][0], msg["val"][1], msg["val"][2], msg["val"][3])
+            } else if (msg["val"] == "O")
+            {
+                DrawCircle(msg["val"][0], msg["val"][1], msg["val"][2], msg["val"][3])
+            }
             console.log(msg["coords"]);
-
             console.log(msg["val"]);
-
             break;
 
         case "victoryEvent":
