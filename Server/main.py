@@ -3,6 +3,7 @@ import websockets
 import ssl
 import pathlib
 import json
+import random
 
 numDimensions = 3
 width = 3
@@ -44,22 +45,32 @@ def getCell(coords, boardID):
     return boards[boardID][coords[0]][coords[1]][coords[2]][coords[3]]
 
 def setCell(coords, val, boardID):
+    
     i = 0
     #[0, 1, 1]
-    subArrayString = "boards[" + boardID + "]"
+    subArrayString = "boards[" + str(boardID) + "]"
     while i < len(coords):
         subArrayString += "[" + str(coords[i]) + "]"
         i += 1
 
     exec(str(subArrayString) + " = val")
+    
 
-def generateToken():
+def generateBoard():
+    boards[len(boards)] = createDimension()
+
+def generateToken(nextTeamToAssign):
     token = random.randint(1,10000)
     if token in users:
-        token = generateToken()
+        token = generateToken(nextTeamToAssign)
 
-    if boards[len(boards)-1]["numPlay"]
-    users[token] = {"token":token, "team":nextTeamToAssign, board:nextAvaliableBoard}
+    if len(boards) == len(users)/2:
+        nextAvaliableBoard = len(boards)
+        generateBoard()
+    else:
+        nextAvaliableBoard = len(boards)-1
+
+    users[token] = {"token":token, "team":nextTeamToAssign, "board":nextAvaliableBoard}
     if (nextTeamToAssign == "X"):
         nextTeamToAssign = "O"
     if (nextTeamToAssign == "O"):
@@ -143,16 +154,24 @@ async def commandHandler(msg, websocket):
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
-        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X"m "token":generateToken()}))
+        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":"X", "turn":"X", "token":generateToken(nextTeamToAssign)}))
 
     if msg["cmdtype"] == "setCell":
-        setCell(msg["coords"], msg["val"])
-        print(msg["val"])
-        victory = checkVictory(users[msg["token"]]["board"])
-        if victory[0]:
-            print(str(victory[1]) + " HAS WON THE MATCH! at " + str(winLocation))
+        boardID = users[msg["token"]]["board"]
+        if boardsData[boardID]["turn"] == users[msg["token"]]["turn"]:
+            setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
+            print(msg["val"])
+            victory = checkVictory(users[msg["token"]]["board"])
+            if victory[0]:
+                print(str(victory[1]) + " HAS WON MATCH " + str(users[msg["token"]]["board"]) + "! at " + str(winLocation))
+                await websocket.send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
+        
+            if boardsData[boardID]["turn"] == "X":
+                boardsData[boardID]["turn"] = "O"
+            else:
+                boardsData[boardID]["turn"] = "X"
 
-        await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"]}))
+            await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
 
     if (msg["cmdtype"] == "getCell"):
         await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
@@ -161,7 +180,7 @@ async def commandHandler(msg, websocket):
 # setCell([2, 1, 1, 1], "X")
 # setCell([1, 1, 1, 1], "X")
 # setCell([0, 1, 1, 1], "X")
-checkIfInCenterOfLine(1, 1, 1, 1, False)
+#checkIfInCenterOfLine(1, 1, 1, 1, False)
 
 async def echo(websocket, path):
     async for message in websocket:
