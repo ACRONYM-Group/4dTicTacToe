@@ -145,15 +145,19 @@ canvas.addEventListener("mousedown", function (e) {
         boole = !boole;
         SetPlayerTeamText(boole)
         if (boole) {
-        Fdrawx(bx, by, sx, sy);
+            ws.send(JSON.stringify({
+                cmdtype: "setCell",
+                coords: [bx, by, sx, sy],
+                val: "X",
+                token: loginToken
+            }));
         } else {
             ws.send(JSON.stringify({
                 cmdtype: "setCell",
                 coords: [bx, by, sx, sy],
                 val: "O",
-                token: loginTokenz
+                token: loginToken
             }));
-            DrawCircle(bx, by, sx, sy);
         }
     } else {
         console.log("Cancelling draw move")
@@ -214,18 +218,12 @@ ws.addEventListener("open", function (event) {
     //         val: "X"
     //     })
     // );
-    ws.send(
-        JSON.stringify({
-            cmdtype: "getCell",
-            coords: [0, 0, 0, 0]
-        })
-    );
-    ws.send(
-        JSON.stringify({
-            cmdtype: "getCell",
-            coords: [0, 1, 0, 0]
-        })
-    );
+    // ws.send(
+    //     JSON.stringify({
+    //         cmdtype: "getCell",
+    //         coords: [0, 0, 0, 0]
+    //     })
+    // );
 });
 
 
