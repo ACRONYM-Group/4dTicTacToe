@@ -1,19 +1,4 @@
 console.log("working :)");
-//Networking
-ws = new WebSocket("ws://127.0.0.1:8000");
-
-ws.addEventListener('open', function (event) 
-{
-    ws.send(JSON.stringify({ cmdtype: "login" }));
-    ws.send(JSON.stringify({ cmdtype: "setCell", coords: [0, 0, 0, 0], val: "X" }));
-    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 0, 0, 0] }));
-    ws.send(JSON.stringify({ cmdtype: "getCell", coords: [0, 1, 0, 0] }));
-});
-
-ws.addEventListener('message', function (event) 
-{
-    console.log('Message from server ', event.data);
-});
 var bx = 0;
 var by = 0;
 var sx = 0;
@@ -213,6 +198,12 @@ function trackclick()
     console.log("BX:" + bx + " BY:" + by  + " SX:" + sx + " SY:" + sy)
 }
 
+function DrawCircle(BigX, BigY, SmallX, SmallY) {
+    ctx.beginPath();
+    ctx.arc(27.5 + size * SmallX + gridSeperation * BigX, 27.5 + size * SmallY + gridSeperation * BigY, 9, 0, 2 * Math.PI);
+    ctx.stroke();
+}
+
 function Fdrawx(){
     if(turn == true){
         console.log("heyo");
@@ -259,6 +250,7 @@ canvas.addEventListener('mousedown', function(e)
     coordcom();
     Fdrawx();
 })
+
 /*var MousePosX = 0;
 var MousePosY = 0;
 function GetMousePos(event) {
@@ -268,8 +260,7 @@ function GetMousePos(event) {
         MousePosY = event.clientY;
         console.log("X: " + MousePosX);
         console.log("Y: " + MousePosX);
-    }
-
+    }*/
 //Networking
 ws = new WebSocket("ws://127.0.0.1:8000");
 
@@ -297,4 +288,4 @@ function sendText() {
     ws.send(JSON.stringify(msg));
 
     // Blank the text input element, ready to receive the next line of text from the user.
-    document.getElementById("text").value = "";*/
+    document.getElementById("text").value = "";}
