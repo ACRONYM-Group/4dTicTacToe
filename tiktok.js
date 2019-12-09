@@ -135,21 +135,22 @@ function Fdrawx(BigX, BigY, SmallX, SmallY) {
 
 //On every click \/
 canvas.addEventListener("mousedown", function (e) {
+    if (!gameEnded) {
+        getCursorPosition(canvas, e);
 
-    getCursorPosition(canvas, e);
+        trackclick();
 
-    trackclick();
-
-    if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) {
-        console.log(loginToken);
-        ws.send(JSON.stringify({
-            cmdtype: "setCell",
-            coords: [bx, by, sx, sy],
-            val: PlayerTeamInternal,
-            token: loginToken
-        }));
-    } else {
-        console.log("Cancelling draw move")
+        if (bx % 1 == 0 && by % 1 == 0 && sx % 1 == 0 && sy % 1 == 0) {
+            console.log(loginToken);
+            ws.send(JSON.stringify({
+                cmdtype: "setCell",
+                coords: [bx, by, sx, sy],
+                val: PlayerTeamInternal,
+                token: loginToken
+            }));
+        } else {
+            console.log("Cancelling draw move")
+        }
     }
 
 });
@@ -192,6 +193,7 @@ function SetTurnState(Turn, Team) {
 
 //Victory set
 //Recieve victory condition from server
+var gameEnded = false;
 function SetWinState(Who) {
     const TurnState = document.getElementById("PlayerTurn");
     if (Who == PlayerTeamInternal) {
@@ -201,15 +203,47 @@ function SetWinState(Who) {
     } else {
         TurnState.innerHTML = "Defeat! You have lost!";
     }
+
+    ws.close()
+    gameEnded = true;
+}
+
+var boardID = "";
+function SetBoardID(ID) {
+    document.getElementById("BoardID").innerText = "Board ID: " + ID;
+    boardID = ID;
+}
+
+function createBoard() {
+    ws.send(
+        JSON.stringify({
+            cmdtype: "login",
+            joinConfig: {type:"new"}
+        })
+    );
+
+    document.getElementById("joinUI").style.display = "none";
+}
+
+function joinBoard() {
+    var IDToJoin = document.getElementById("BoardIDInput").value;
+    if (IDToJoin == "") {
+        IDToJoin = "AVALIABLE";
+    }
+    console.log(IDToJoin);
+    ws.send(
+        JSON.stringify({
+            cmdtype: "login",
+            joinConfig: {type:"existing", ID:IDToJoin}
+        })
+    );
+
+    document.getElementById("joinUI").style.display = "none";
 }
 
 //Networking
 ws.addEventListener("open", function (event) {
-    ws.send(
-        JSON.stringify({
-            cmdtype: "login"
-        })
-    );
+    
 });
 
 ws.addEventListener("message", function (event) {
@@ -227,6 +261,9 @@ ws.addEventListener("message", function (event) {
 
             //Get turn and team and send it to SetTurnState
             SetTurnState(msg["turn"], msg["team"]);
+
+            //Get boardID and display it
+            SetBoardID(msg["board"]);
 
             break;
         case "stateChange":

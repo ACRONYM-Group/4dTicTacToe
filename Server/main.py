@@ -14,8 +14,7 @@ numDimensions = 3
 width = 3
 winLocation = []
 nextTeamToAssign = "X"
-boards = []
-boardsData = []
+boards = {}
 
 def createDimension(itNum=0):
     dimension = {}
@@ -48,13 +47,13 @@ def createDimension(itNum=0):
 users = {}
 
 def getCell(coords, boardID):
-    return boards[boardID][coords[0]][coords[1]][coords[2]][coords[3]]
+    return boards[boardID].boardState[coords[0]][coords[1]][coords[2]][coords[3]]
 
 def setCell(coords, val, boardID):
     
     i = 0
     #[0, 1, 1]
-    subArrayString = "boards[" + str(boardID) + "]"
+    subArrayString = "boards[" + str(boardID) + "]" + ".boardState"
     while i < len(coords):
         subArrayString += "[" + str(coords[i]) + "]"
         i += 1
@@ -62,24 +61,64 @@ def setCell(coords, val, boardID):
     exec(str(subArrayString) + " = val")
     
 
-def generateBoard():
-    boards.append(createDimension())
-    boardsData.append({"turn":"X"})
+class board:
+    def __init__(self):
+        self.id = self.generateBoardID()
+        self.boardState = createDimension()
+        self.turn = "X"
+        self.players = []
+        self.gameState = "inProgress"
+        self.visibility = "Public"
+    
+    def generateBoardID(self):
+        genID = random.randint(1,10000)
+        for i in boards:
+            if boards[i].id == genID:
+                genID = self.generateBoardID()
 
-def generateToken(websocket):
+        return genID
+
+    
+
+
+def generateBoard(): 
+    temp = board()
+    boards[temp.id] = temp
+    return temp.id
+    del temp
+
+def generateToken(websocket, joinConfig):
     global nextTeamToAssign
     token = random.randint(1,10000)
     if token in users:
         token = generateToken()
 
-    if len(boards) == len(users)/2:
-        nextAvaliableBoard = len(boards)
-        generateBoard()
-    else:
-        nextAvaliableBoard = len(boards)-1
+    boardID = "NOTFOUND"
+
+    if joinConfig["type"] == "existing":
+        if joinConfig["ID"] == "AVALIABLE":
+            for i in boards:
+                if len(boards[i].players) < 2 and boardID == "NOTFOUND" and boards[i].visibility != "Private":
+                    boardID = i
+                    boards[i].players.append(token)
+            if boardID == "NOTFOUND":
+                boardID = generateBoard()
+                boards[boardID].players.append(token)
+        else:
+            if int(joinConfig["ID"]) in boards:
+                boardID = int(joinConfig["ID"])
+                print(boards)
+                boards[boardID].players.append(token)
+            else:
+                return "ERR-Board Does Not Exist"
+    elif joinConfig["type"] == "new":
+        boardID = generateBoard()
+        boards[boardID].players.append(token)
+        boards[boardID].visibility = "Private"
+            
 
     print("Assiging Team" + nextTeamToAssign)
-    users[token] = {"token":token, "team":nextTeamToAssign, "board":nextAvaliableBoard, "socket":websocket}
+    users[token] = {"token":token, "team":nextTeamToAssign, "board":boardID, "socket":websocket}
     if (nextTeamToAssign == "X"):
         nextTeamToAssign = "O"
     elif (nextTeamToAssign == "O"):
@@ -108,6 +147,7 @@ def checkVictory(boardID):
 
             by += 1
         bx += 1 
+
     
     return [foundWinCondition, winner]
 
@@ -125,9 +165,9 @@ def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything, boardID):
                 while focussy > -2 and focussy < 2:
                     if (bx+focusbx > -1 and bx+focusbx < width and by+focusby > -1 and by+focusby < width and sx+focussx > -1 and sx+focussx < width and sy+focussy > -1 and sy+focussy < width and (abs(focusbx) + abs(focusby) + abs(focussx) + abs(focussy) != 0)):
                         
-                        if (boards[boardID][bx+focusbx][by+focusby][sx+focussx][sy+focussy] == boards[boardID][bx][by][sx][sy]):
+                        if (boards[boardID].boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy] == boards[boardID].boardState[bx][by][sx][sy]):
                             #print("Adjacent Found " + str([bx+focusbx, by+focusby, sx+focussx, sy+focussy]))
-                            testVar = [focusbx, focusby, focussx, focussy, boards[boardID][bx+focusbx][by+focusby][sx+focussx][sy+focussy], bx, by, sx, sy]
+                            testVar = [focusbx, focusby, focussx, focussy, boards[boardID].boardState[bx+focusbx][by+focusby][sx+focussx][sy+focussy], bx, by, sx, sy]
                             #print(testVar)
                             adjacentCells.append(testVar)
                     focussy += 1
@@ -144,7 +184,7 @@ def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything, boardID):
     winner = 0
     for i in adjacentCells:
         for k in adjacentCells:
-            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3] and i[4] == boards[boardID][i[5]][i[6]][i[7]][i[8]] and i[4] != 0 and i[4] != 1:
+            if i[0] == -k[0] and i[1] == -k[1] and i[2] == -k[2] and i[3] == -k[3] and i[4] == boards[boardID].boardState[i[5]][i[6]][i[7]][i[8]] and i[4] != 0 and i[4] != 1:
                 print(i)
                 foundWinCondition = True
                 winner = i[4]
@@ -162,44 +202,47 @@ async def commandHandler(msg, websocket):
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
-        newToken = generateToken(websocket)
-        await websocket.send(json.dumps({"cmdtype":"loginResponse", "team":users[newToken]["team"], "turn":boardsData[users[newToken]["board"]], "token":newToken}))
+        newToken = generateToken(websocket, msg["joinConfig"])
+        if isinstance(users[newToken]["board"], str):
+            await websocket.send(json.dumps({"cmdtype":"loginError", "errMsg":users[newToken]["board"]}))
+            del users[newToken]
+        else:
+            await websocket.send(json.dumps({"cmdtype":"loginResponse", "board":boards[users[newToken]["board"]].id, "team":users[newToken]["team"], "turn":boards[users[newToken]["board"]].turn, "token":newToken}))
 
     if msg["cmdtype"] == "setCell":
         print(msg)
         boardID = users[msg["token"]]["board"]
-        if boardsData[boardID]["turn"] == users[msg["token"]]["team"]:
-            setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
-            print(msg["val"])
-            victory = checkVictory(users[msg["token"]]["board"])
-            if victory[0]:
-                print(str(victory[1]) + " HAS WON MATCH " + str(users[msg["token"]]["board"]) + "! at " + str(winLocation))
-                #await websocket.send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
-                #print("Victory Sent")
-        
-            if boardsData[boardID]["turn"] == "X":
-                boardsData[boardID]["turn"] = "O"
-            else:
-                boardsData[boardID]["turn"] = "X"
-            await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
-            for u in users:
-                if users[u]["board"] == boardID:
-                    await users[u]["socket"].send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
-                    if victory[0]:
-                        await users[u]["socket"].send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
+        if boards[boardID].turn == users[msg["token"]]["team"] and boards[boardID].gameState == "inProgress":
+            if getCell(msg["coords"], boardID) != "X" and getCell(msg["coords"], boardID) != "O":
+                setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
+                print(msg["val"])
+                victory = checkVictory(users[msg["token"]]["board"])
+            
+                if boards[boardID].turn == "X":
+                    boards[boardID].turn = "O"
+                else:
+                    boards[boardID].turn = "X"
+                await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
+                for u in users:
+                    if users[u]["board"] == boardID:
+                        await users[u]["socket"].send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
+                        if victory[0]:
+                            await users[u]["socket"].send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
+
+                if victory[0]:
+                    print(str(victory[1]) + " HAS WON MATCH " + str(users[msg["token"]]["board"]) + "! at " + str(winLocation))
+                    boards[boardID].gameState = "Ended"
+                    del boards[boardID]
 
     if (msg["cmdtype"] == "getCell"):
         await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
 
-
-# setCell([2, 1, 1, 1], "X")
-# setCell([1, 1, 1, 1], "X")
-# setCell([0, 1, 1, 1], "X")
-#checkIfInCenterOfLine(1, 1, 1, 1, False)
-
 async def echo(websocket, path):
-    async for message in websocket:
-        await commandHandler(json.loads(message), websocket)
+    try:
+        async for message in websocket:
+            await commandHandler(json.loads(message), websocket)
+    except websockets.exceptions.ConnectionClosedError:
+        print("Client Disconnecting.")
 
 
 asyncio.get_event_loop().run_until_complete(
