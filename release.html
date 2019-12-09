@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>4d TicTacToe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <python>
+        import header
+        print(header.header)
+    </python>
+    <div id="main">
+        <div align="center">
+            <h1>4D Tic Tac Toe</h1>
+            <div>
+                <canvas id="TicTacToe" style="padding:0px;"></canvas>
+            </div>
+        </div>
+        <div id="displayArea" style="float:left; position: absolute; left:20px; top:90px;">
+            <p id="PlayerTeam"> </p>
+            <p id="PlayerTurn"> </p>
+            <p id="BoardID"> </p>
+            <P id="errStr"> </P>
+            <div id="joinUI">
+                <textarea rows="1" cols="31" id="BoardIDInput" placeholder="Board ID (Default is Avaliable)"></textarea>
+                <div style="display:flex;">
+                    <button onclick="joinBoard()">Join Board</button>
+                    <button onclick="createBoard()">Create Board</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="tiktok.js"></script>
+</body>
+</html>
