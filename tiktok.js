@@ -1,5 +1,5 @@
 console.log("working :)");
-ws = new WebSocket("ws://127.0.0.1:8000");
+ws = new WebSocket("ws://scienceandpizza.com:8000");
 
 var loginToken = 0;
 
@@ -200,6 +200,8 @@ function SetWinState(Who) {
         TurnState.innerHTML = "Victory! You have won!";
     } else if (Who == "Tie") {
         TurnState.innerHTML = "Tie! No one won!";
+    } else if (Who == "Timeout") {
+        TurnState.innerHTML = "Match has timed out. Sorry.";
     } else {
         TurnState.innerHTML = "Defeat! You have lost!";
     }
@@ -212,6 +214,10 @@ var boardID = "";
 function SetBoardID(ID) {
     document.getElementById("BoardID").innerText = "Board ID: " + ID;
     boardID = ID;
+}
+
+function SetErrorString(String) {
+    document.getElementById("BoardID").innerText = String;
 }
 
 function createBoard() {
@@ -284,6 +290,10 @@ ws.addEventListener("message", function (event) {
 
         case "victoryEvent":
             SetWinState(msg["winner"])
+            break;
+
+        case "loginError":
+            SetErrorString(msg["errMsg"]);
             break;
     }
 });

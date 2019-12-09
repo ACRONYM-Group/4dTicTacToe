@@ -4,6 +4,7 @@ import pathlib
 import json
 import random
 import sys
+import time
 print(sys.executable)
 
 import websockets
@@ -59,7 +60,8 @@ def setCell(coords, val, boardID):
         i += 1
 
     exec(str(subArrayString) + " = val")
-    
+
+    boards[boardID].lastInteract = time.time()
 
 class board:
     def __init__(self):
@@ -69,6 +71,7 @@ class board:
         self.players = []
         self.gameState = "inProgress"
         self.visibility = "Public"
+        self.lastInteract = time.time()
     
     def generateBoardID(self):
         genID = random.randint(1,10000)
@@ -87,7 +90,7 @@ def generateBoard():
     return temp.id
     del temp
 
-def generateToken(websocket, joinConfig):
+async def generateToken(websocket, joinConfig):
     global nextTeamToAssign
     token = random.randint(1,10000)
     if token in users:
@@ -97,10 +100,18 @@ def generateToken(websocket, joinConfig):
 
     if joinConfig["type"] == "existing":
         if joinConfig["ID"] == "AVALIABLE":
+            boardsToDelete = []
             for i in boards:
                 if len(boards[i].players) < 2 and boardID == "NOTFOUND" and boards[i].visibility != "Private":
-                    boardID = i
-                    boards[i].players.append(token)
+                    if boards[i].lastInteract < time.time() - 25:
+                        boardsToDelete.append(i)
+                    else:
+                        boardID = i
+                        boards[i].players.append(token)
+                        boards[i].lastInteract = time.time()
+            
+            for i in boardsToDelete:
+                del boards[i]
             if boardID == "NOTFOUND":
                 boardID = generateBoard()
                 boards[boardID].players.append(token)
@@ -109,6 +120,7 @@ def generateToken(websocket, joinConfig):
                 boardID = int(joinConfig["ID"])
                 print(boards)
                 boards[boardID].players.append(token)
+                boards[boardID].lastInteract = time.time()
             else:
                 return "ERR-Board Does Not Exist"
     elif joinConfig["type"] == "new":
@@ -202,40 +214,52 @@ async def commandHandler(msg, websocket):
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
-        newToken = generateToken(websocket, msg["joinConfig"])
-        if isinstance(users[newToken]["board"], str):
-            await websocket.send(json.dumps({"cmdtype":"loginError", "errMsg":users[newToken]["board"]}))
-            del users[newToken]
+        newToken = await generateToken(websocket, msg["joinConfig"])
+        if isinstance(newToken, str):
+            await websocket.send(json.dumps({"cmdtype":"loginError", "errMsg":newToken}))
         else:
             await websocket.send(json.dumps({"cmdtype":"loginResponse", "board":boards[users[newToken]["board"]].id, "team":users[newToken]["team"], "turn":boards[users[newToken]["board"]].turn, "token":newToken}))
 
-    if msg["cmdtype"] == "setCell":
-        print(msg)
-        boardID = users[msg["token"]]["board"]
-        if boards[boardID].turn == users[msg["token"]]["team"] and boards[boardID].gameState == "inProgress":
-            if getCell(msg["coords"], boardID) != "X" and getCell(msg["coords"], boardID) != "O":
-                setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
-                print(msg["val"])
-                victory = checkVictory(users[msg["token"]]["board"])
-            
-                if boards[boardID].turn == "X":
-                    boards[boardID].turn = "O"
-                else:
-                    boards[boardID].turn = "X"
-                await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
-                for u in users:
-                    if users[u]["board"] == boardID:
-                        await users[u]["socket"].send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
-                        if victory[0]:
-                            await users[u]["socket"].send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
+        for bx in boards[users[newToken]["board"]].boardState:
+            for by in boards[users[newToken]["board"]].boardState[bx]:
+                for sx in boards[users[newToken]["board"]].boardState[bx][by]:
+                    for sy in boards[users[newToken]["board"]].boardState[bx][by][sx]:
+                        if boards[users[newToken]["board"]].boardState[bx][by][sx][sy] == "X" or boards[users[newToken]["board"]].boardState[bx][by][sx][sy] == "O":
+                            print("Sending BoardState to new User")
+                            await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":[bx, by, sx, sy], "val":boards[users[newToken]["board"]].boardState[bx][by][sx][sy], "turn":boards[users[newToken]["board"]].turn, "team":users[newToken]["team"]}))
 
-                if victory[0]:
-                    print(str(victory[1]) + " HAS WON MATCH " + str(users[msg["token"]]["board"]) + "! at " + str(winLocation))
-                    boards[boardID].gameState = "Ended"
-                    del boards[boardID]
+    if msg["cmdtype"] == "setCell":
+        boardID = users[msg["token"]]["board"]
+        if boardID in boards:
+            if boards[boardID].turn == users[msg["token"]]["team"] and boards[boardID].gameState == "inProgress":
+                if getCell(msg["coords"], boardID) != "X" and getCell(msg["coords"], boardID) != "O":
+                    setCell(msg["coords"], msg["val"], users[msg["token"]]["board"])
+                    print(msg["val"])
+                    victory = checkVictory(users[msg["token"]]["board"])
+                
+                    if boards[boardID].turn == "X":
+                        boards[boardID].turn = "O"
+                    else:
+                        boards[boardID].turn = "X"
+                    await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
+                    for u in users:
+                        if users[u]["board"] == boardID:
+                            await users[u]["socket"].send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
+                            if victory[0]:
+                                await users[u]["socket"].send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
+
+                    if victory[0]:
+                        print(str(victory[1]) + " HAS WON MATCH " + str(users[msg["token"]]["board"]) + "! at " + str(winLocation))
+                        boards[boardID].gameState = "Ended"
+                        del boards[boardID]
+        else:
+            await websocket.send(json.dumps({"cmdtype":"victoryEvent", "winner":"Timeout"}))
 
     if (msg["cmdtype"] == "getCell"):
-        await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
+        if users[msg["token"]]["board"] in boards:
+            await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
+        else:
+            await websocket.send(json.dumps({"cmdtype":"victoryEvent", "winner":"Timeout"}))
 
 async def echo(websocket, path):
     try:
