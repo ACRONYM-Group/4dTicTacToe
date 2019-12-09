@@ -194,12 +194,12 @@ function SetTurnState(Turn, Team) {
 //Recieve victory condition from server
 function SetWinState(Who) {
     const TurnState = document.getElementById("PlayerTurn");
-    if (Who == "You") {
+    if (Who == PlayerTeamInternal) {
         TurnState.innerHTML = "Victory! You have won!";
-    } else if (Who == "Them") {
-        TurnState.innerHTML = "Defeat! You have lost!";
-    } else {
+    } else if (Who == "Tie") {
         TurnState.innerHTML = "Tie! No one won!";
+    } else {
+        TurnState.innerHTML = "Defeat! You have lost!";
     }
 }
 
@@ -246,7 +246,7 @@ ws.addEventListener("message", function (event) {
             break;
 
         case "victoryEvent":
-            SetWinState(msg[""])
+            SetWinState(msg["winner"])
             break;
     }
 });

@@ -1,9 +1,12 @@
 import asyncio
-import websockets
 import ssl
 import pathlib
 import json
 import random
+import sys
+print(sys.executable)
+
+import websockets
 
 print("Server online. ")
 
@@ -62,7 +65,6 @@ def setCell(coords, val, boardID):
 def generateBoard():
     boards.append(createDimension())
     boardsData.append({"turn":"X"})
-    print("BoardData " + str(boardsData))
 
 def generateToken(websocket):
     global nextTeamToAssign
@@ -79,7 +81,6 @@ def generateToken(websocket):
     print("Assiging Team" + nextTeamToAssign)
     users[token] = {"token":token, "team":nextTeamToAssign, "board":nextAvaliableBoard, "socket":websocket}
     if (nextTeamToAssign == "X"):
-        print("Next team will be O")
         nextTeamToAssign = "O"
     elif (nextTeamToAssign == "O"):
         nextTeamToAssign = "X"
@@ -149,7 +150,6 @@ def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything, boardID):
                 winner = i[4]
                 hasWrittenAnything = True
                 winLocation = [i[5], i[6], i[7], i[8]]
-                print("WIN")
                 print(str(winLocation) + " " + str(i))
     if (hasWrittenAnything):
         print("----")
@@ -174,18 +174,19 @@ async def commandHandler(msg, websocket):
             victory = checkVictory(users[msg["token"]]["board"])
             if victory[0]:
                 print(str(victory[1]) + " HAS WON MATCH " + str(users[msg["token"]]["board"]) + "! at " + str(winLocation))
-                await websocket.send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
+                #await websocket.send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
+                #print("Victory Sent")
         
             if boardsData[boardID]["turn"] == "X":
                 boardsData[boardID]["turn"] = "O"
             else:
                 boardsData[boardID]["turn"] = "X"
-            print("aoaasda")
-            print(msg["val"])
             await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
             for u in users:
                 if users[u]["board"] == boardID:
                     await users[u]["socket"].send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boardsData[boardID]["turn"], "team":users[msg["token"]]["team"]}))
+                    if victory[0]:
+                        await users[u]["socket"].send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
 
     if (msg["cmdtype"] == "getCell"):
         await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
