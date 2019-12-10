@@ -7,8 +7,8 @@
 
 <body>
     <python>
-    import header
-    print(header.header)
+import header
+print(header.header)
     </python>
     <div id="main">
         <div align="center">
