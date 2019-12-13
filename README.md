@@ -4,14 +4,14 @@
 A playable version of the game can be found at:
 http://scienceandpizza.com/3dTicTacToe/release.dpy
 
-The primary contributors were:
-Alex Schmidt
-Ethan Hunt
-Ian Newbold
-Jordan Hofstrand
-Rochester McLain
+The primary contributors were:<br>
+Alex Schmidt<br>
+Ethan Hunt<br>
+Ian Newbold<br>
+Jordan Hofstrand<br>
+Rochester McLain<br>
 
-More information is avaliable at the website linked above.
+More information is avaliable at the website linked above.<br>
 
 
 "Just a reminder that this is a public repository"
