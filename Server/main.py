@@ -264,13 +264,15 @@ async def commandHandler(msg, websocket):
 async def echo(websocket, path):
     try:
         async for message in websocket:
+            print(message)
             await commandHandler(json.loads(message), websocket)
     except websockets.exceptions.ConnectionClosedError:
         print("Client Disconnecting.")
 
 
 asyncio.get_event_loop().run_until_complete(
-    websockets.serve(echo, 'localhost', 8000))
+    websockets.serve(echo, port=8000))
+print("Listening")
 asyncio.get_event_loop().run_forever()
 
 

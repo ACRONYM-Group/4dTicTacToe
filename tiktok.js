@@ -1,5 +1,5 @@
 console.log("working :)");
-ws = new WebSocket("ws://scienceandpizza.com:8000");
+ws = new WebSocket("ws://35.225.173.218:8000");
 
 var loginToken = 0;
 
