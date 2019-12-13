@@ -6,10 +6,42 @@
 </head>
 
 <body>
-    <python>
-import header
-print(header.header)
-    </python>
+    <header class="navbar">
+        <div class="flexbox">
+            <div class="logoDiv" style="position: relative;">
+                <a href="index.dpy" style="display:flex; padding:0; margin-left:10px;">
+                    <img src="ACRONYM.png" style="width: 40px; height:40px;">
+                    <h3 class="logo">ACRONYM</h3>
+                </a>
+            </div>
+            <div class="dropdownBar"></div>
+            <div class="dropdown">
+                <button class="dropbtn">ACRONYMIC</button>
+                <div class="dropdown-content">
+                    <a href="signup.dpy">Sign Up</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">About Us</button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Projects</button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                    <a href="#">Link 4</a>
+                    <a href="#">Link 5</a>
+                </div>
+            </div>
+            <a href="login.dpy" class="loginButton">Log In</a>
+        </div>
+
+    </header>
     <div id="main">
         <div align="center">
             <h1>4D Tic Tac Toe</h1>
@@ -17,17 +49,86 @@ print(header.header)
                 <canvas id="TicTacToe" style="padding:0px;"></canvas>
             </div>
         </div>
-        <div id="displayArea" style="float:left; position: absolute; left:20px; top:90px;">
+        <div id="displayArea" style="float:left; position: absolute; left:80px; top:150px;">
             <p id="PlayerTeam"> </p>
             <p id="PlayerTurn"> </p>
             <p id="BoardID"> </p>
             <P id="errStr"> </P>
             <div id="joinUI">
-                <textarea rows="1" cols="31" id="BoardIDInput" placeholder="Board ID (Default is Avaliable)"></textarea>
+                <textarea rows="1" cols="38" id="BoardIDInput" placeholder="Board ID (Default is Avaliable)"></textarea>
                 <div style="display:flex;">
                     <button onclick="joinBoard()">Join Board</button>
-                    <button onclick="createBoard()">Create Board</button>
+                    <button onclick="createBoard()">Create Private Board</button>
                 </div>
+            </div>
+        </div>
+
+        <div align="center">
+            <h2 style="margin-top:75px;">How do I play?</h2>
+            <div style="justify-content: center; width:60%;">
+                <p style="text-align:left;">The game is played much like regular Tic Tac Toe, except that each of the boards is linked as it would be if they were stacked in 4 Dimensional space. Each horizontal and vertical row/column stacks such that each cell is adjacent to the same cell in the other grids in that row/column. First to 3 in a row wins. Clicking Join game will add you to the first avaliable board that only has a single player in it. If there are not any boards with a free player slot, a new board will be created. If you enter a board ID before clicking join game you can join a specific board (Regardless of the number of players.). Clicking Create Private Game will Create a private board. Players will not be automatically assigned to this board and will need to enter the board ID to access it. Once you are done playing a board, you can refresh your browser window to play again.</p>
+            </div>
+
+            <div style="width:70%; height:1px; background-color:rgb(207, 207, 207); margin:25px;"></div>
+
+            <h2 style="margin-top:150px;">What is this?</h2>
+            <div style="justify-content: center; width:60%;">
+                <p style="text-align:left;">4D Tic Tac Toe was created as a project at an A.C.R.O.N.Y.M. Meeting in December of 2019. Our goal was to create an interesting piece of software over the course of 24 continous hours. The game was completed and playable within that time, but several more hours were put into refining it, and setting up the server which now hosts it. A team of 5 worked on this project, and are listed below. The client code is written in standard HTML + Javascript, while the backend is written in Python. Communication is over Websocket. There is also a small amount of Dynamic Python involved in rendering the page, accomplished with <a href="https://github.com/CarterTS" style="color:white;">Carter Plasek's</a> custom Web Server. All code for this project (Excluding the web server code.) is Avaliable on Github, linked below.</a></p>
+            </div>
+            <div style="width:70%; height:1px; background-color:rgb(207, 207, 207); margin:25px;"></div>
+
+            <h2 style="margin-top:75px;">Who was Involved?</h2>
+            <div style="display:flex; flex-wrap:wrap; justify-content: center; width:100%;">
+                <div style="display:flex; margin:30px;">
+                    <img class="profilePic" src="./Jordan.jpeg">
+                    <div>
+                        <H4 class="profileText">Jordan Hofstrand</H4>
+                        <H4 class="profileText">Server, Web Admin (Weaver of Webs)</H4>
+                        <H4 class="profileText">Jordan.Hofstrand@ScienceAndPizza.com</H4>
+                        <a href="https://github.com/Jordanayan" class="profileText">https://github.com/Jordanayan</a>
+                    </div>
+                </div>
+
+                <div style="display:flex; margin:30px;">
+                    <img class="profilePic" src="./Rochester.jpeg">
+                    <div>
+                        <H4 class="profileText">Rochester McLain</H4>
+                        <H4 class="profileText">Maths, Chief Organizer</H4>
+                        <H4 class="profileText">Rochester.McLain@ScienceAndPizza.com</H4>
+                    </div>
+                </div>
+
+                <div style="display:flex; margin:30px;">
+                    <img class="profilePic" src="./Ethan.jpeg">
+                    <div>
+                        <H4 class="profileText">Ethan Hunt</H4>
+                        <H4 class="profileText">Client Networking</H4>
+                        <H4 class="profileText">Ethan.Hunt@ScienceAndPizza.com</H4>
+                    </div>
+                </div>
+
+                <div style="display:flex; margin:30px;">
+                    <div>
+                        <H4 class="profileText">Ian Newbold</H4>
+                        <H4 class="profileText">Official Bad Ideas Officer</H4>
+                        <H4 class="profileText">Ian.Newbold@ScienceAndPizza.com</H4>
+                    </div>
+                </div>
+
+                <div style="display:flex; margin:30px;">
+                    <div>
+                        <H4 class="profileText">Alex Schmidt</H4>
+                        <H4 class="profileText">User Interface</H4>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width:70%; height:1px; background-color:rgb(207, 207, 207); margin:25px;"></div>
+
+            <h2 style="margin-top:75px;">Were's the Source Code?</h2>
+            <div class="profileFlexbox" style="height:250px; justify-content: center;">
+                <img class="profilePic" src="./Github.png" >
+                <a href="https://github.com/ACRONYM-Group/3dTicTacToe" style="color:white; margin:20px;">The Tic Tac Toe Project on Github</a>
             </div>
         </div>
 
