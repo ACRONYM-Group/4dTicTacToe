@@ -1,6 +1,6 @@
 console.log("working :)");
 //ws = new WebSocket("ws://35.225.173.218:8000");
-ws = new WebSocket("ws://127.0.0.1:8000");
+ws = new WebSocket("ws://scienceandpizza.com:8000");
 
 usernameWords=["Fluffy","Unicorn","Pizza","Person","Cake","Night","Knight","Valve","Bing","Pupil","Leg","Foot","Arm","Camel","Squirel","Cat","Dog","Cocoa","Sun",
 "Moon","Virus","Funny","Panda","Zoo","Splat","Squishy","Google","Boom","Pop","Snap","Taco","Burrito","Mother","Father","Dentist","Computer","Bot","Roll","Imaginary",
@@ -8,9 +8,9 @@ usernameWords=["Fluffy","Unicorn","Pizza","Person","Cake","Night","Knight","Valv
 "Fanboy","Fangirl","Police","Firefighter","Light","Bulb","Camera","Goo","Gooey","Television","Daylight","Walrus","Cow","Antelope","Factory","Bakery","Nymph","Legion",
 "Freedom","Fighter","Keyboard","Medicine","Person","Friendly","Bold","Bright","Tall","Silly","Impressive","Smart","Know-It-All","Blonde","Ginger","Tiger","Spotted",
 "Guitar","Guitarist","Band","Machine","TicTacToe","Dimensional","4D","Hyperdimensional","Lizard","Zuckerberg","Math","Mathematician","Perspective","Total","Vortex",
-"Hypercube","Tesseract","Drifter","Explorer","Victory","Mine","Minesweeper","314","Popsicle","IceCream","Ice","Cream","Power","FluxCapacitor","Klingon","Star","Ship",
+"Hypercube","Tesseract","Drifter","Explorer","Victory","Mine","Minesweeper","314","Popsicle","IceCream","Ice","Power","FluxCapacitor","Klingon","Star","Ship",
 "Yes","No","Candy","Cookie","Eater","Restraunt","Dinner","Dash","Sweat","Sweet","628","1701","42","159","26","NewYork","LA","Brother","Sister","Horse","Pig","Happy",
-"FunTime","Fun","Time","SwearWord","Universe","Master","SetPointButtons","Don'tForget","Drive","Fast","Dragon","Scroll","Wizard","Magic","Spell","Pump","House","?!",
+"FunTime","Fun","Time","SwearWord","Universe","Master","SetPointButtons","Don'tForget","Drive","Fast","Dragon","Scroll","Wizard","Magic","Spell","House","?!",
 ".","#!@","??","!!","Rhino","Dollar","Dell"]
 
 
@@ -253,6 +253,15 @@ function SetPlayerList(users) {
     document.getElementById("playerList").innerHTML = textToAdd;
 }
 
+function setStats(msg) {
+    document.getElementById("numGames").innerHTML = msg["stats"]["numGames"]
+    document.getElementById("numMoves").innerHTML = msg["stats"]["numMoves"]
+    document.getElementById("numPageLoads").innerHTML = msg["stats"]["numPageLoads"]
+    document.getElementById("numXWins").innerHTML = msg["stats"]["numXWins"]
+    document.getElementById("numOWins").innerHTML = msg["stats"]["numOWins"]
+    document.getElementById("avgMovesPerGame").innerHTML = msg["stats"]["avgMovesPerGame"]
+}
+
 function SetErrorString(String) {
     document.getElementById("BoardID").innerText = String;
 }
@@ -315,6 +324,9 @@ ws.addEventListener("message", function (event) {
             //Show back to lobby button
             document.getElementById("backToLobby").style.display = "block"
 
+            //update stats
+            setStats(msg)
+
             break;
         case "stateChange":
 
@@ -339,6 +351,9 @@ ws.addEventListener("message", function (event) {
         case "loginError":
             SetErrorString(msg["errMsg"]);
             break;
+        
+        case "stats":
+            setStats(msg)
     }
 });
 

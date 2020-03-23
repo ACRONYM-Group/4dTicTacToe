@@ -8,6 +8,8 @@ import time
 import ACI
 import threading
 print(sys.executable)
+conn = 0
+
 
 
 import websockets
@@ -84,13 +86,13 @@ class board:
 
         return genID
 
-    def updatePlayerList(self):
+    async def updatePlayerList(self):
         for token in self.players:
             usernames = []
             for token in self.players:
                 usernames.append(users[token]["username"])
             for token in self.players: 
-                data = json.dumps({"cmdtype":"loginResponse", "board":boards[users[token]["board"]].id, "team":users[token]["team"], "turn":boards[users[token]["board"]].turn, "token":token, "users":usernames})
+                data = json.dumps({"cmdtype":"loginResponse", "board":boards[users[token]["board"]].id, "team":users[token]["team"], "turn":boards[users[token]["board"]].turn, "token":token, "users":usernames, "stats":{"numGames": await conn["TicTac"]["numGames"], "numMoves": await conn["TicTac"]["numMoves"], "numXWins": await conn["TicTac"]["numXWins"], "numOWins": await conn["TicTac"]["numOWins"], "avgMovesPerGame": await conn["TicTac"]["avgMovesPerGame"], "numPageLoads": await conn["TicTac"]["numPageLoads"]}})
                 asyncio.create_task(self.sendMSG(data, token))
 
     async def sendMSG(self, data, token):
@@ -99,7 +101,9 @@ class board:
         except:
             print("Player no longer active")
 
-def generateBoard():
+async def generateBoard():
+    async with conn["TicTac"] as interface:
+        interface["numGames"] = int(await conn["TicTac"]["numGames"]) + 1
     temp = board()
     boards[temp.id] = temp
     return temp.id
@@ -128,7 +132,7 @@ async def generateToken(websocket, joinConfig):
             for i in boardsToDelete:
                 del boards[i]
             if boardID == "NOTFOUND":
-                boardID = generateBoard()
+                boardID = await generateBoard()
                 boards[boardID].players.append(token)
         else:
             if int(joinConfig["ID"]) in boards:
@@ -256,7 +260,7 @@ async def commandHandler(msg, websocket):
             await websocket.send(json.dumps({"cmdtype":"loginError", "errMsg":newToken}))
         else:
             users[newToken]["username"] = msg["joinConfig"]["username"]
-            boards[users[newToken]["board"]].updatePlayerList()
+            await boards[users[newToken]["board"]].updatePlayerList()
 
         for bx in boards[users[newToken]["board"]].boardState:
             for by in boards[users[newToken]["board"]].boardState[bx]:
@@ -280,6 +284,11 @@ async def commandHandler(msg, websocket):
                     else:
                         boards[boardID].turn = "X"
                     await websocket.send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
+                    async with conn["TicTac"] as interface:
+                        interface["numMoves"] = int(await conn["TicTac"]["numMoves"]) + 1
+                    async with conn["TicTac"] as interface:
+                        interface["avgMovesPerGame"] = round(int(await conn["TicTac"]["numMoves"])/int(await conn["TicTac"]["numGames"]),1)
+                    
                     for u in users:
                         if users[u]["board"] == boardID:
                             await users[u]["socket"].send(json.dumps({"cmdtype":"stateChange", "coords":msg["coords"], "val":msg["val"], "turn":boards[boardID].turn, "team":users[msg["token"]]["team"]}))
@@ -287,6 +296,8 @@ async def commandHandler(msg, websocket):
                                 await users[u]["socket"].send(json.dumps({"cmdtype":"victoryEvent", "winner":victory[1]}))
 
                     if victory[0]:
+                        async with conn["TicTac"] as interface:
+                            interface["num" + victory[1] + "Wins"] = int(await conn["TicTac"]["num" + victory[1] + "Wins"]) + 1
                         print(str(victory[1]) + " HAS WON MATCH " + str(users[msg["token"]]["board"]) + "! at " + str(winLocation))
                         boards[boardID].gameState = "Ended"
                         del boards[boardID]
@@ -303,7 +314,16 @@ async def commandHandler(msg, websocket):
         users[msg["token"]]["heartbeat"] = time.time()
 
 async def echo(websocket, path):
+    global conn
     print(websocket)
+    conn = await ACI.async_create(ACI.Client, 8765, "127.0.0.1", "main")
+    time.sleep(0.5)
+    async with conn["TicTac"] as interface:
+        interface["numPageLoads"] = int(await conn["TicTac"]["numPageLoads"]) + 1
+
+    time.sleep(0.5)
+
+    await websocket.send(json.dumps({"cmdtype":"stats", "stats":{"numGames": await conn["TicTac"]["numGames"], "numMoves": await conn["TicTac"]["numMoves"], "numXWins": await conn["TicTac"]["numXWins"], "numOWins": await conn["TicTac"]["numOWins"], "avgMovesPerGame": await conn["TicTac"]["avgMovesPerGame"], "numPageLoads": await conn["TicTac"]["numPageLoads"]}}))
     try:
         async for message in websocket:
             print(message)
@@ -312,16 +332,11 @@ async def echo(websocket, path):
     except websockets.exceptions.ConnectionClosedError:
         print("Client Disconnecting.")
 
-def getNumGames():
-    print(database["TicTac"]["numGames"])
-
-#threading.Thread(target=getNumGames, daemon=True).start()
 
 
 asyncio.set_event_loop(asyncio.new_event_loop())
 asyncio.get_event_loop().run_until_complete(
     websockets.serve(echo, port=8000))
-#database = ACI.create(ACI.Client, 8765, "127.0.0.1", "main")
 print("Listening")
 asyncio.get_event_loop().run_forever()
 
