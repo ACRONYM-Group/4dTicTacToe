@@ -130,6 +130,13 @@ body {
     text-align: center;
 }
 
+.StatItem {
+    display:flex;
+    margin-left:50px;
+    margin-right:50px;
+    color:rgb(194, 147, 18);
+}
+
 .appConsoleHeader {
     display: flex;
     background-color: #585858;

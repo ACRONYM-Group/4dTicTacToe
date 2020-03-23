@@ -1,5 +1,29 @@
 console.log("working :)");
-ws = new WebSocket("ws://35.225.173.218:8000");
+//ws = new WebSocket("ws://35.225.173.218:8000");
+ws = new WebSocket("ws://127.0.0.1:8000");
+
+usernameWords=["Fluffy","Unicorn","Pizza","Person","Cake","Night","Knight","Valve","Bing","Pupil","Leg","Foot","Arm","Camel","Squirel","Cat","Dog","Cocoa","Sun",
+"Moon","Virus","Funny","Panda","Zoo","Splat","Squishy","Google","Boom","Pop","Snap","Taco","Burrito","Mother","Father","Dentist","Computer","Bot","Roll","Imaginary",
+"Chatroom","Ninja","Doorway","Window","Obsidian","Ant","Spaceship","Book","Fly","Safe","Yesterday","The","It","Tomorrow","Weekday","Weekend","School","Teacher",
+"Fanboy","Fangirl","Police","Firefighter","Light","Bulb","Camera","Goo","Gooey","Television","Daylight","Walrus","Cow","Antelope","Factory","Bakery","Nymph","Legion",
+"Freedom","Fighter","Keyboard","Medicine","Person","Friendly","Bold","Bright","Tall","Silly","Impressive","Smart","Know-It-All","Blonde","Ginger","Tiger","Spotted",
+"Guitar","Guitarist","Band","Machine","TicTacToe","Dimensional","4D","Hyperdimensional","Lizard","Zuckerberg","Math","Mathematician","Perspective","Total","Vortex",
+"Hypercube","Tesseract","Drifter","Explorer","Victory","Mine","Minesweeper","314","Popsicle","IceCream","Ice","Cream","Power","FluxCapacitor","Klingon","Star","Ship",
+"Yes","No","Candy","Cookie","Eater","Restraunt","Dinner","Dash","Sweat","Sweet","628","1701","42","159","26","NewYork","LA","Brother","Sister","Horse","Pig","Happy",
+"FunTime","Fun","Time","SwearWord","Universe","Master","SetPointButtons","Don'tForget","Drive","Fast","Dragon","Scroll","Wizard","Magic","Spell","Pump","House","?!",
+".","#!@","??","!!","Rhino","Dollar","Dell"]
+
+
+var word1 = Math.floor(Math.random()*usernameWords.length);
+var word2 = Math.floor(Math.random()*usernameWords.length);
+var word3 = Math.floor(Math.random()*usernameWords.length);
+var username = usernameWords[word1] + usernameWords[word2] + usernameWords[word3]
+
+document.getElementById("usernameInput").value = username
+
+function setUsername() {
+    username = document.getElementById("usernameInput").value
+}
 
 var loginToken = 0;
 
@@ -10,8 +34,8 @@ var sx = 0;
 var sy = 0;
 
 var canvas = document.getElementById("TicTacToe");
-canvas.width = 325;
-canvas.height = 325;
+canvas.width = 306;
+canvas.height = 306;
 
 var ctx = canvas.getContext("2d");
 var cx = 0;
@@ -164,9 +188,9 @@ function SetPlayerTeamText(PlayerTeam) {
     PlayerTeamInternal = PlayerTeam;
 
     if (PlayerTeam == "X") {
-        TeamText.innerHTML = "You are: X";
+        TeamText.innerHTML = PlayerTeam;
     } else if (PlayerTeam == "O") {
-        TeamText.innerHTML = "You are: O";
+        TeamText.innerHTML = PlayerTeam;
     } else {
         TeamText.innerHTML = "Errors.";
     }
@@ -216,6 +240,19 @@ function SetBoardID(ID) {
     boardID = ID;
 }
 
+function SetPlayerList(users) {
+    var textToAdd = "<p style='color:white; margin-bottom:5px;'>Players</p><div style='background-color:white; width:200px; height:2px;'></div>";
+    for (var i = 0; i < users.length; i++) {
+        var nameColor = "white"
+        if (users[i] == username) {
+            nameColor = "rgb(104, 187, 255)"
+        }
+
+        textToAdd += "<p style='color:" + nameColor + ";'>" + users[i] + "</p>"
+    }
+    document.getElementById("playerList").innerHTML = textToAdd;
+}
+
 function SetErrorString(String) {
     document.getElementById("BoardID").innerText = String;
 }
@@ -224,7 +261,7 @@ function createBoard() {
     ws.send(
         JSON.stringify({
             cmdtype: "login",
-            joinConfig: {type:"new"}
+            joinConfig: {type:"new", "username":username}
         })
     );
 
@@ -240,12 +277,13 @@ function joinBoard() {
     ws.send(
         JSON.stringify({
             cmdtype: "login",
-            joinConfig: {type:"existing", ID:IDToJoin}
+            joinConfig: {type:"existing", ID:IDToJoin, "username":username}
         })
     );
 
     document.getElementById("joinUI").style.display = "none";
 }
+
 
 //Networking
 ws.addEventListener("open", function (event) {
@@ -270,6 +308,12 @@ ws.addEventListener("message", function (event) {
 
             //Get boardID and display it
             SetBoardID(msg["board"]);
+
+            //Display players in playerList
+            SetPlayerList(msg["users"]);
+
+            //Show back to lobby button
+            document.getElementById("backToLobby").style.display = "block"
 
             break;
         case "stateChange":
@@ -324,3 +368,15 @@ ws.addEventListener("message", function (event) {
     // Blank the text input element, ready to receive the next line of text from the user.
     document.getElementById("text").value = "";
 }*/
+
+function everyOtherSecond() {
+    if (loginToken != 0) {
+        ws.send(
+            JSON.stringify({
+                cmdtype: "heartbeat",
+                token: loginToken
+            }))
+    }
+}
+
+setInterval(everyOtherSecond, 2000)

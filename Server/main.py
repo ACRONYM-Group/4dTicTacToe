@@ -5,7 +5,10 @@ import json
 import random
 import sys
 import time
+import ACI
+import threading
 print(sys.executable)
+
 
 import websockets
 
@@ -81,10 +84,22 @@ class board:
 
         return genID
 
-    
+    def updatePlayerList(self):
+        for token in self.players:
+            usernames = []
+            for token in self.players:
+                usernames.append(users[token]["username"])
+            for token in self.players: 
+                data = json.dumps({"cmdtype":"loginResponse", "board":boards[users[token]["board"]].id, "team":users[token]["team"], "turn":boards[users[token]["board"]].turn, "token":token, "users":usernames})
+                asyncio.create_task(self.sendMSG(data, token))
 
+    async def sendMSG(self, data, token):
+        try:
+            await users[token]["socket"].send(data)
+        except:
+            print("Player no longer active")
 
-def generateBoard(): 
+def generateBoard():
     temp = board()
     boards[temp.id] = temp
     return temp.id
@@ -130,7 +145,7 @@ async def generateToken(websocket, joinConfig):
             
 
     print("Assiging Team" + nextTeamToAssign)
-    users[token] = {"token":token, "team":nextTeamToAssign, "board":boardID, "socket":websocket}
+    users[token] = {"token":token, "team":nextTeamToAssign, "board":boardID, "socket":websocket, "username":"None", "heartbeat":time.time()}
     if (nextTeamToAssign == "X"):
         nextTeamToAssign = "O"
     elif (nextTeamToAssign == "O"):
@@ -210,7 +225,29 @@ def checkIfInCenterOfLine(bx, by, sx, sy, hasWrittenAnything, boardID):
     else:
         return [foundWinCondition, winner]
 
+def checkHeartbeats():
+    tokensToRemove = []
+    for token in users:
+        if users[token]["heartbeat"] < time.time() - 15:
+            tokensToRemove.append(token)
+
+    for token in tokensToRemove:
+        print(token)
+        print(users[token]["board"])
+        if users[token]["board"] in boards:
+            for index, player in enumerate(boards[users[token]["board"]].players):
+                if player == token:
+                    boardID = users[token]["board"]
+                    boards[users[token]["board"]].players.remove(player)
+                    users.pop(player)
+                    boards[boardID].updatePlayerList()
+        else:
+            users.pop(token)
+
+
 async def commandHandler(msg, websocket):
+
+    checkHeartbeats()
 
     if msg["cmdtype"] == "login":
         print("Player is loging in.")
@@ -218,7 +255,8 @@ async def commandHandler(msg, websocket):
         if isinstance(newToken, str):
             await websocket.send(json.dumps({"cmdtype":"loginError", "errMsg":newToken}))
         else:
-            await websocket.send(json.dumps({"cmdtype":"loginResponse", "board":boards[users[newToken]["board"]].id, "team":users[newToken]["team"], "turn":boards[users[newToken]["board"]].turn, "token":newToken}))
+            users[newToken]["username"] = msg["joinConfig"]["username"]
+            boards[users[newToken]["board"]].updatePlayerList()
 
         for bx in boards[users[newToken]["board"]].boardState:
             for by in boards[users[newToken]["board"]].boardState[bx]:
@@ -260,18 +298,30 @@ async def commandHandler(msg, websocket):
             await websocket.send(json.dumps({"cmdtype":"getCellResponse", "coords":msg["coords"], "val":getCell(msg["coords"], users[msg["token"]]["board"])}))
         else:
             await websocket.send(json.dumps({"cmdtype":"victoryEvent", "winner":"Timeout"}))
+    
+    if (msg["cmdtype"] == "heartbeat"):
+        users[msg["token"]]["heartbeat"] = time.time()
 
 async def echo(websocket, path):
+    print(websocket)
     try:
         async for message in websocket:
             print(message)
+            #getNumGames()
             await commandHandler(json.loads(message), websocket)
     except websockets.exceptions.ConnectionClosedError:
         print("Client Disconnecting.")
 
+def getNumGames():
+    print(database["TicTac"]["numGames"])
 
+#threading.Thread(target=getNumGames, daemon=True).start()
+
+
+asyncio.set_event_loop(asyncio.new_event_loop())
 asyncio.get_event_loop().run_until_complete(
     websockets.serve(echo, port=8000))
+#database = ACI.create(ACI.Client, 8765, "127.0.0.1", "main")
 print("Listening")
 asyncio.get_event_loop().run_forever()
 
