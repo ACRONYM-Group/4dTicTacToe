@@ -5,6 +5,13 @@ body {
     color: #FFF;
 }
 
+.ExampleTicTacImg {
+    margin-left:25px;
+    margin-right:25px;
+    width:306px;
+    height:306px;
+}
+
 /* Navbar container */
 .navbar {
     overflow: hidden;

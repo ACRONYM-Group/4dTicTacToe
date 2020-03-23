@@ -112,12 +112,12 @@ print(header.header)
     
                 <h1 style="margin-top:75px;">Example Win Conditions</h1>
                 <h4 style="margin-top:15px;">Each of the following boards is a win for X</h4>
-                <div class="profileFlexbox" style="height:250px; justify-content: center;">
-                    <img src="http://scienceandpizza.com/4dTicTacToe/ExWinState1.png">
-                    <img src="http://scienceandpizza.com/4dTicTacToe/ExWinState2.png">
-                    <img src="http://scienceandpizza.com/4dTicTacToe/ExWinState3.png">
-                    <img src="http://scienceandpizza.com/4dTicTacToe/ExWinState4.png">
-                    <img src="http://scienceandpizza.com/4dTicTacToe/ExWinState5.png">
+                <div class="profileFlexbox" style="height:325px; justify-content: center;">
+                    <img class="ExampleTicTacImg" src="http://scienceandpizza.com/4dTicTacToe/ExWinState1.png">
+                    <img class="ExampleTicTacImg" src="http://scienceandpizza.com/4dTicTacToe/ExWinState2.png">
+                    <img class="ExampleTicTacImg" src="http://scienceandpizza.com/4dTicTacToe/ExWinState3.png">
+                    <img class="ExampleTicTacImg" src="http://scienceandpizza.com/4dTicTacToe/ExWinState4.png">
+                    <img class="ExampleTicTacImg" src="http://scienceandpizza.com/4dTicTacToe/ExWinState5.png">
                 </div>
     
                 <div style="width:70%; height:1px; background-color:rgb(207, 207, 207); margin:25px;"></div>
