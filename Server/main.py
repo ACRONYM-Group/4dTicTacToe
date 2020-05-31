@@ -10,6 +10,10 @@ import threading
 print(sys.executable)
 conn = 0
 
+ACItokenfile = open("/home/tokens/tictac.txt", 'r')
+ACItoken = ACItokenfile.read()
+ACItokenfile.close()
+
 
 
 import websockets
@@ -320,6 +324,7 @@ async def echo(websocket, path):
     time.sleep(0.5)
     async with conn["TicTac"] as interface:
         interface["numPageLoads"] = int(await conn["TicTac"]["numPageLoads"]) + 1
+        ACI.authenticate("bots.tictac", ACIToken)
 
     time.sleep(0.5)
 
