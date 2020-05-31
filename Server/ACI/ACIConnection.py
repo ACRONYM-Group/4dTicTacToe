@@ -1,9 +1,13 @@
 import asyncio
 import websockets
 import json
+import time
 from queue import SimpleQueue
 
-from ACI.utils import hide_async
+try:
+    from utils import allow_sync
+except Exception:
+    from ACI.utils import allow_sync
 
 
 connections = {}
@@ -32,6 +36,10 @@ async def _recv_handler(websocket, _, responses):
         value = json.dumps(["ld", cmd["msg"]])
         responses.put(value)
 
+    if cmd["cmdType"] == "a_auth_response":
+        value = json.dumps(["auth_msg", cmd["msg"]])
+        responses.put(value)
+
 
 class ContextualDatabaseInterface:
     def __init__(self, interface):
@@ -49,11 +57,25 @@ class ContextualDatabaseInterface:
     def __setitem__(self, item, val):
         self.record[item] = val
 
+    @allow_sync
     async def set_item(self, key, val):
         self[key] = val
 
+    @allow_sync
     async def get_item(self, key):
         return self[key]
+
+    @allow_sync
+    async def list_databases(self):
+        return await self.conn.list_databases()
+
+    @allow_sync
+    async def read_from_disk(self):
+        await self.conn.read_from_disk()
+
+    @allow_sync
+    async def write_to_disk(self):
+        await self.conn.write_to_disk()
 
 
 class DatabaseInterface:
@@ -66,6 +88,7 @@ class DatabaseInterface:
 
         self._contextual = None
 
+    @allow_sync
     async def write_to_disk(self):
         """
         Write Database data to disk
@@ -74,6 +97,7 @@ class DatabaseInterface:
         """
         await self.conn.ws.send(json.dumps({"cmdType": "wtd", "db_key": self.db_key}))
 
+    @allow_sync
     async def read_from_disk(self):
         """
         Read Database data from disk
@@ -82,6 +106,7 @@ class DatabaseInterface:
         """
         await self.conn.ws.send(json.dumps({"cmdType": "rfd", "db_key": self.db_key}))
 
+    @allow_sync
     async def list_databases(self):
         """
         Get a list of all connected databases
@@ -91,21 +116,26 @@ class DatabaseInterface:
         await self.conn.ws.send(json.dumps({"cmdType": "list_databases", "db_key": self.db_key}))
         return json.loads(await self.conn.wait_for_response("ld", None, self.db_key))
 
-    @hide_async
     async def _get_value(self, key):
-        print("Hi, I am running now!")
         await self.conn.ws.send(json.dumps({"cmdType": "get_val", "key": key, "db_key": self.db_key}))
         response = await self.conn.wait_for_response("get_val", key, self.db_key)
         return response
 
+    @allow_sync
     async def set_value(self, key, val):
         await self.conn.ws.send(json.dumps({"cmdType": "set_val", "key": key, "db_key": self.db_key, "val": val}))
+        response = await self.conn.wait_for_response("set_val")
+        return response
 
+    @allow_sync
     async def get_value(self, key):
-        await self[key]
+        return await self._get_value(key)
 
     def __getitem__(self, key):
-        return self._get_value(key)
+        return self.get_value(key)
+
+    def __setitem__(self, key, val):
+        self.set_value(key, val)
 
     async def __aenter__(self):
         self._contextual = ContextualDatabaseInterface(self)
@@ -142,7 +172,7 @@ class Connection:
     async def start(self):
         await self._create(self.port, self.ip, self.loop, self.responses)
 
-    async def wait_for_response(self, _, key, db_key):
+    async def wait_for_response(self, _, key="none", db_key="none"):
         """
         Waits for a response
         :param _:
@@ -156,9 +186,12 @@ class Connection:
                 cmd = json.loads(value)
                 if tuple(cmd)[:3] == ("get_val", key, db_key):
                     return cmd[3]
-                elif tuple(cmd)[:3] == ("set_val", key, db_key):
-                    return cmd[3]
+                elif cmd[0] == ("set_val"):
+                    print(cmd[1])
+                    return cmd[1]
                 elif cmd[0] == "ld":
+                    return cmd[1]
+                elif cmd[0] == "auth_msg":
                     return cmd[1]
 
     async def _create(self, port, ip, loop, responses):
@@ -187,7 +220,9 @@ class Connection:
         uri = "ws://%s:%s" % (ip, port)
 
         async with websockets.connect(uri) as websocket:
+            # print(websocket)
             self.ws = websocket
+            time.sleep(0.25)
             while True:
                 consumer_task = asyncio.ensure_future(_recv_handler(self.ws, uri, responses))
 
@@ -209,3 +244,10 @@ class Connection:
         if key not in self.interfaces:
             self.interfaces[key] = self._get_interface(key)
         return self.interfaces[key]
+
+    async def create_database(self, db_key):
+        await self.ws.send(json.dumps({"cmdType": "cdb", "db_key": db_key}))
+
+    async def authenticate(self, id, token):
+        await self.ws.send(json.dumps({"cmdType":"a_auth", "id":id, "token":token}))
+        return await self.wait_for_response("auth_msg", None, None)
