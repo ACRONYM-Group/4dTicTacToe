@@ -2,6 +2,16 @@ import threading
 import asyncio
 import sys
 
+try:
+    from ACIConnection import *
+    from ACIServer import *
+    from errors import *
+    from database import *
+    Client = Connection
+except Exception as e:
+    raise Exception("foo occurred").with_traceback(e)
+    print("__init__ was probably loaded, skipping imports")
+
 
 def create(aci_class, port=8765, ip="127.0.0.1", name="main"):
     """
@@ -17,10 +27,7 @@ def create(aci_class, port=8765, ip="127.0.0.1", name="main"):
     result = aci_class(loop, ip, port, name)
 
     if asyncio.iscoroutinefunction(result.start):
-        def wrapper():
-            asyncio.run(result.start())
-
-        threading.Thread(target=wrapper, daemon=True).start()
+        return asyncio.run(async_create(aci_class, port=8765, ip="127.0.0.1", name="main"))
     else:
         threading.Thread(target=result.start, daemon=True).start()
 
