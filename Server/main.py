@@ -321,7 +321,7 @@ async def echo(websocket, path):
     async with conn["TicTac"] as interface:
         interface["numPageLoads"] = int(await conn["TicTac"]["numPageLoads"]) + 1
         ACITokenfile = open("/home/tokens/tictac.txt", 'r')
-        ACIToken = ACItokenfile.read()
+        ACIToken = ACITokenfile.read()
         ACITokenfile.close()
         conn.authenticate("bots.tictac", ACIToken)
 
