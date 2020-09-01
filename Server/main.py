@@ -319,11 +319,11 @@ async def echo(websocket, path):
     conn = await ACI.async_create(ACI.Client, 8765, "127.0.0.1", "main")
     time.sleep(0.5)
     async with conn["TicTac"] as interface:
-        interface["numPageLoads"] = int(await conn["TicTac"]["numPageLoads"]) + 1
         ACITokenfile = open("/home/tokens/tictac.txt", 'r')
-        ACIToken = ACITokenfile.read()
+        ACIToken = ACITokenfile.read().rstrip("\n")
         ACITokenfile.close()
-        conn.authenticate("bots.tictac", ACIToken)
+        print("Authentication " + conn.authenticate("bots.tictac", ACIToken))
+        interface["numPageLoads"] = int(await conn["TicTac"]["numPageLoads"]) + 1
 
     time.sleep(0.5)
 
